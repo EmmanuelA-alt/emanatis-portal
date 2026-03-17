@@ -270,12 +270,15 @@ function init(){
       DATA = data;
       localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
       if(gaiaMode){
-        populateSelect();
+        CURRENT_UNIT = '5a'; // Gaia client's unit
+        document.getElementById('unitSelect') && (document.getElementById('unitSelect').style.display='none');
         document.getElementById('saveBtn') && (document.getElementById('saveBtn').style.display='none');
         document.getElementById('exportBtn') && (document.getElementById('exportBtn').style.display='none');
         document.getElementById('importBtn') && (document.getElementById('importBtn').style.display='none');
         document.body.classList.add('readonly-mode');
-        document.querySelector('h1').textContent = 'Galatsi — Construction Timeline (Read-Only)';
+        document.querySelector('h1').textContent = 'Gaia — Unit 5A Timeline';
+        document.getElementById('uiSub').textContent = 'Ipeirou 22, Galatsi | Private Client Portal';
+        renderUnit('5a');
       } else {
         populateSelect();
         toast('Loaded editor');
@@ -286,7 +289,7 @@ function init(){
       if(saved){
         try{
           DATA = JSON.parse(saved);
-          if(gaiaMode){ populateSelect(); document.getElementById('saveBtn')&&(document.getElementById('saveBtn').style.display='none'); document.getElementById('exportBtn')&&(document.getElementById('exportBtn').style.display='none'); document.getElementById('importBtn')&&(document.getElementById('importBtn').style.display='none'); document.body.classList.add('readonly-mode'); }
+          if(gaiaMode){ CURRENT_UNIT='5a'; document.getElementById('unitSelect')&&(document.getElementById('unitSelect').style.display='none'); document.getElementById('saveBtn')&&(document.getElementById('saveBtn').style.display='none'); document.getElementById('exportBtn')&&(document.getElementById('exportBtn').style.display='none'); document.getElementById('importBtn')&&(document.getElementById('importBtn').style.display='none'); document.body.classList.add('readonly-mode'); document.querySelector('h1').textContent='Gaia — Unit 5A Timeline'; document.getElementById('uiSub').textContent='Ipeirou 22, Galatsi | Private Client Portal'; renderUnit('5a'); }
           else { populateSelect(); toast('Loaded from local cache'); }
           return;
         }catch(e){}
@@ -295,7 +298,7 @@ function init(){
         .then(function(r){return r.json();})
         .then(function(data){
           DATA = data;
-          if(gaiaMode){ populateSelect(); document.getElementById('saveBtn')&&(document.getElementById('saveBtn').style.display='none'); document.getElementById('exportBtn')&&(document.getElementById('exportBtn').style.display='none'); document.getElementById('importBtn')&&(document.getElementById('importBtn').style.display='none'); document.body.classList.add('readonly-mode'); }
+          if(gaiaMode){ CURRENT_UNIT='5a'; document.getElementById('unitSelect')&&(document.getElementById('unitSelect').style.display='none'); document.getElementById('saveBtn')&&(document.getElementById('saveBtn').style.display='none'); document.getElementById('exportBtn')&&(document.getElementById('exportBtn').style.display='none'); document.getElementById('importBtn')&&(document.getElementById('importBtn').style.display='none'); document.body.classList.add('readonly-mode'); document.querySelector('h1').textContent='Gaia — Unit 5A Timeline'; document.getElementById('uiSub').textContent='Ipeirou 22, Galatsi | Private Client Portal'; renderUnit('5a'); }
           else populateSelect();
         })
         .catch(function(){
