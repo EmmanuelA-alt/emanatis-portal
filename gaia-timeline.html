@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galatsi — Construction Timeline Editor</title>
+<title>Galatsi Residence — Construction Timeline</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#e8e8e8}
@@ -11,7 +11,8 @@ header{background:#16161d;border-bottom:1px solid #2a2a3a;padding:20px 32px;disp
 header h1{font-size:20px;font-weight:600;color:#fff}
 .sub{font-size:13px;color:#888;margin-top:4px}
 .header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-select{background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;min-width:200px}
+.badge{background:#1e3a5f;color:#5ba3f5;font-size:12px;padding:6px 14px;border-radius:20px;border:1px solid #2a5080}
+select{background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;min-width:180px}
 select:focus{outline:1px solid #5ba3f5}
 .btn{padding:8px 20px;border-radius:8px;border:1px solid;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s}
 .btn-primary{background:#1e3a5f;color:#5ba3f5;border-color:#2a5080}
@@ -20,7 +21,8 @@ select:focus{outline:1px solid #5ba3f5}
 .btn-save:hover{background:#22663d}
 .btn-danger{background:#3a1020;color:#f05070;border-color:#8a2040}
 .btn-danger:hover{background:#5a1830}
-.lang-btn{background:#1e1e2e;border:1px solid #3a3a5a;color:#aaa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s}.lang-btn:hover{background:#2a2a4a;color:#fff}
+.lang-btn{background:#1e1e2e;border:1px solid #3a3a5a;color:#aaa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s}
+.lang-btn:hover{background:#2a2a4a;color:#fff}
 .container{padding:24px 32px;max-width:1600px;margin:0 auto}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
 .stat{background:#16161d;border:1px solid #2a2a3a;border-radius:10px;padding:14px 18px}
@@ -31,55 +33,57 @@ select:focus{outline:1px solid #5ba3f5}
 .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa}
 .legend-dot{width:12px;height:12px;border-radius:3px}
 .gantt-wrap{background:#16161d;border:1px solid #2a2a3a;border-radius:12px;overflow-x:auto;overflow-y:visible;cursor:grab}
-.gantt-inner{min-width:2200px}
-.gantt-header-row{display:flex;background:#1a1a24;border-bottom:1px solid #2a2a3a;position:sticky;top:52px;z-index:12}
-.gh-label{position:sticky;left:0;z-index:14;min-width:400px;width:400px;border-right:1px solid #2a2a3a;padding:10px 16px;font-size:11px;color:#666;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#1a1a24}
-.gh-months{flex:1;display:flex}
-.gh-month{flex:1;min-width:180px;padding:10px 0;text-align:center;font-size:11px;font-weight:600;color:#666;letter-spacing:1px;text-transform:uppercase;border-right:1px solid #222}
-.section-hdr{background:#08080e;padding:14px 16px 10px;font-size:12px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#5ba3f5;border-bottom:2px solid #1e3a5f;border-top:3px solid #2a2a3a;position:relative}
+.gantt-inner{min-width:1800px}
+.gantt-header-row{display:flex;background:#1a1a24;border-bottom:1px solid #2a2a3a;position:sticky;top:0;z-index:12;height:42px}
+.gh-label{position:sticky;left:0;z-index:14;min-width:320px;width:320px;border-right:1px solid #2a2a3a;padding:10px 16px;font-size:11px;color:#666;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:#1a1a24;flex-shrink:0}
+.gh-months{flex:1;display:block;position:relative;height:42px;overflow:visible}
+.gh-month{position:absolute;top:0;height:42px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#5ba3f5;letter-spacing:1px;text-transform:uppercase;border-right:2px solid #3a3a5a;background:#1a1a24;overflow:visible}
+.section-hdr{background:#08080e;padding:12px 16px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#5ba3f5;border-bottom:2px solid #1e3a5f;border-top:3px solid #2a2a3a}
 .section-hdr-label{position:sticky;left:0;z-index:11;background:#08080e;padding-right:16px}
-.task-row{display:flex;border-bottom:1px solid #1a1a24;align-items:stretch;min-height:52px;transition:background 0.15s}
+.task-row{display:flex;border-bottom:1px solid #1e1e28;align-items:stretch;min-height:52px;transition:background 0.15s}
 .task-row:hover{background:#1c1c26}
-.task-label{position:sticky;left:0;z-index:2;min-width:400px;width:400px;padding:8px 16px;display:flex;align-items:center;gap:10px;border-right:1px solid #2a2a3a;background:#16161d}
+.task-label{position:sticky;left:0;z-index:2;min-width:320px;width:320px;padding:8px 16px;display:flex;align-items:center;gap:8px;border-right:1px solid #2a2a3a;background:#16161d}
 .task-row:hover .task-label{background:#1c1c26}
+.task-icon{font-size:16px;flex-shrink:0}
 .task-name{font-size:13px;font-weight:500;color:#ccc}
 .task-note{font-size:11px;color:#666;margin-top:2px}
 .task-timeline{flex:1;position:relative}
+.task-timeline::before{content:'';position:absolute;top:0;bottom:0;left:0;right:0;pointer-events:none;z-index:1}
+/* Month grid lines */
+.month-grid-line{position:absolute;top:0;bottom:0;width:1px;background:#3a3a5a;z-index:1}
 .today-line{position:absolute;top:0;bottom:0;width:2px;background:#f05070;z-index:5;opacity:0.8}
-.bar{height:28px;border-radius:6px;position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;cursor:pointer;transition:filter 0.15s;min-width:4px}
-.bar-date{font-size:10px;opacity:.9;flex-shrink:0}
+.bar{height:28px;border-radius:6px;position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;cursor:pointer;transition:filter 0.15s;min-width:4px}
+.bar-date{font-size:10px;opacity:1;color:#4dba78;text-align:center}
+.bar-date-external{color:#4dba78}
 .bar:hover{filter:brightness(1.2);box-shadow:0 0 8px rgba(255,255,255,0.1)}
 .bar.dragging{opacity:.9;box-shadow:0 0 16px rgba(91,163,245,.45)}
-.bar .handle{position:absolute;top:0;bottom:0;width:14px;background:rgba(91,163,245,0.001);z-index:2}.bar .handle-left{left:0;cursor:ew-resize}.bar .handle-right{right:0;cursor:ew-resize}.bar .handle:hover{background:rgba(91,163,245,.18)}
+.bar .handle{position:absolute;top:0;bottom:0;width:14px;background:rgba(91,163,245,0.001);z-index:2}
+.bar .handle-left{left:0;cursor:ew-resize}
+.bar .handle-right{right:0;cursor:ew-resize}
+.bar .handle:hover{background:rgba(91,163,245,.18)}
 .bar.complete{background:linear-gradient(90deg,#1a4a2e,#22663d);border:1px solid #2d8a52;color:#4dba78}
 .bar.inprogress{background:linear-gradient(90deg,#3a2a10,#5a4010);border:1px solid #8a6420;color:#f0a830}
 .bar.pending{background:linear-gradient(90deg,#1a1a3a,#252545);border:1px solid #353560;color:#7878c0}
 .bar.critical{background:linear-gradient(90deg,#3a1020,#5a1830);border:1px solid #8a2040;color:#f05070}
 .bar.blocked{background:linear-gradient(90deg,#3a2010,#5a3010);border:1px solid #8a5020;color:#f08030}
-/* Editor panel */
-.editor-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:50;justify-content:center;align-items:center}
-.editor-overlay.active{display:flex}
-.editor{background:#16161d;border:1px solid #3a3a5a;border-radius:16px;padding:32px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
-.editor h2{font-size:18px;color:#fff;margin-bottom:4px}
-.editor .task-id{font-size:12px;color:#666;margin-bottom:20px}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit}
-.field input:focus,.field select:focus,.field textarea:focus{outline:1px solid #5ba3f5}
-.field textarea{resize:vertical;min-height:60px}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.editor-actions{display:flex;gap:12px;margin-top:24px;justify-content:flex-end}
-/* Bulk edit */
-.bulk-bar{background:#16161d;border:1px solid #2a2a3a;border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.bulk-bar label{font-size:12px;color:#888}
-/* Unit info editor */
-.unit-info{background:#16161d;border:1px solid #2a2a3a;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
-.unit-info .field{margin-bottom:0}
-/* Handover + Notes */
+.bar.ordered{background:linear-gradient(90deg,#0d3320,#14512e);border:1px solid #1d7a44;color:#3ddc6e}
+/* Procurement grid */
+.procurement-grid{margin-bottom:24px;background:#16161d;border:1px solid #1d7a44;border-radius:12px;padding:20px 24px}
+.procurement-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.procurement-title{font-size:11px;color:#3ddc6e;text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+.procurement-sub{font-size:13px;color:#888;margin-top:4px}
+.procurement-badge{background:#0d3320;border:1px solid #1d7a44;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;color:#3ddc6e}
+.procurement-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.procurement-item{background:#0d2018;border:1px solid #1d7a44;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.procurement-check{color:#3ddc6e;font-size:16px}
+.procurement-item-name{font-size:13px;font-weight:500;color:#ccc}
+.procurement-item-note{font-size:11px;color:#666;margin-top:2px}
+/* Handover panel */
 .handover-panel{margin-top:24px;background:#16161d;border:1px solid #2d8a52;border-radius:12px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center}
 .handover-panel h3{color:#4dba78;font-size:16px}
 .handover-panel p{color:#888;font-size:13px;margin-top:4px}
 .handover-panel .hdate{font-size:22px;font-weight:700;color:#fff}
+/* Notes section */
 .notes-section{margin-top:24px;background:#16161d;border:1px solid #2a2a3a;border-radius:12px;padding:24px}
 .notes-section h3{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -93,11 +97,22 @@ select:focus{outline:1px solid #5ba3f5}
 .note-card p{font-size:13px;color:#ccc;line-height:1.5}
 .note-add{background:none;border:1px dashed #3a3a5a;color:#888;padding:14px 16px;border-radius:8px;cursor:pointer;font-size:13px;text-align:center;transition:all 0.15s}
 .note-add:hover{border-color:#5ba3f5;color:#5ba3f5}
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;background:#1a4a2e;color:#4dba78;padding:14px 24px;border-radius:10px;border:1px solid #2d8a52;font-size:14px;font-weight:600;z-index:100;transform:translateY(100px);opacity:0;transition:all 0.3s}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.error{background:#3a1020;color:#f05070;border-color:#8a2040}
-.drag-tooltip{display:none;position:fixed;background:#1e1e2e;border:1px solid #3a3a5a;border-radius:8px;padding:10px 12px;font-size:12px;color:#ddd;z-index:120;pointer-events:none}
+.notes-custom{margin-top:16px}
+.notes-custom textarea{width:100%;background:#1a1a24;border:1px solid #2a2a3a;border-radius:8px;padding:12px 14px;color:#ccc;font-size:13px;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.notes-custom textarea:focus{border-color:#5a5a9a}
+/* Editor modals */
+.editor-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:50;justify-content:center;align-items:center}
+.editor-overlay.active{display:flex}
+.editor{background:#16161d;border:1px solid #3a3a5a;border-radius:16px;padding:32px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.editor h2{font-size:18px;color:#fff;margin-bottom:4px}
+.editor .task-id{font-size:12px;color:#666;margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:10px 14px;border-radius:8px;font-size:14px;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{outline:1px solid #5ba3f5}
+.field textarea{resize:vertical;min-height:60px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.editor-actions{display:flex;gap:12px;margin-top:24px;justify-content:flex-end}
 /* Nav bar */
 .nav-bar{background:#16161d;border-bottom:1px solid #2a2a3a;padding:10px 32px;display:flex;gap:10px;align-items:center;position:sticky;top:0;z-index:20}
 .btn-nav{background:#1e1e2e;color:#aaa;border-color:#3a3a5a;padding:6px 16px}
@@ -105,54 +120,66 @@ select:focus{outline:1px solid #5ba3f5}
 .btn-today{background:#1e3a5f;color:#5ba3f5;border-color:#2a5080;padding:6px 16px}
 .btn-today:hover{background:#2a5080}
 .nav-range{font-size:12px;color:#666;margin-left:auto}
-.empty-state{text-align:center;padding:80px 32px;color:#555}
-.empty-state h2{font-size:24px;margin-bottom:12px;color:#888}
-.empty-state p{font-size:14px;max-width:400px;margin:0 auto}
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a4a2e;color:#4dba78;padding:14px 24px;border-radius:10px;border:1px solid #2d8a52;font-size:14px;font-weight:600;z-index:100;transform:translateY(100px);opacity:0;transition:all 0.3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{background:#3a1020;color:#f05070;border-color:#8a2040}
+.drag-tooltip{display:none;position:fixed;background:#1e1e2e;border:1px solid #3a3a5a;border-radius:8px;padding:10px 12px;font-size:12px;color:#ddd;z-index:120;pointer-events:none}
+/* Live pulse */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.live-indicator{display:flex;align-items:center;gap:6px;margin-right:8px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#4dba78;box-shadow:0 0 8px #4dba78;animation:pulse 2s infinite}
+.live-text{font-size:11px;color:#4dba78;font-weight:700;letter-spacing:1px}
+/* Read-only mode */
+body.readonly-mode .bar{cursor:default!important;pointer-events:none}
+body.readonly-mode .note-card{cursor:default!important;pointer-events:none}
+body.readonly-mode .note-add{display:none!important}
+body.readonly-mode .btn{display:none!important}
+body.readonly-mode .lang-btn{display:block!important}
+body.readonly-mode select{display:none!important}
+/* Responsive */
 @media(max-width:768px){
   header{padding:16px}
   .container{padding:16px}
   .stats{grid-template-columns:repeat(2,1fr)}
   .task-label{min-width:220px;width:220px}
   .gh-label{min-width:220px;width:220px}
-  .unit-info{grid-template-columns:1fr}
+  .procurement-items{grid-template-columns:1fr}
 }
-/* Client readonly mode */
-body.readonly-mode .bar{cursor:default!important;pointer-events:none}
-body.readonly-mode .note-card{cursor:default!important;pointer-events:none}
-body.readonly-mode .note-add{display:none!important}
-body.readonly-mode .field input,body.readonly-mode .field textarea{pointer-events:none;opacity:0.8}
-body.readonly-mode .task-label{cursor:default!important}
-body.readonly-mode .btn{display:none!important}
-body.readonly-mode .lang-btn{display:block!important}
 </style>
 </head>
 <body>
 
 <header>
-<div>
-  <h1 id="uiTitle">Galatsi — Construction Timeline Editor</h1>
-  <div class="sub" id="uiSub">Ipeirou 22, Galatsi</div>
-</div>
-<div class="header-right">
-  <select id="unitSelect"><option value="">— Select Unit —</option></select>
-  <button class="btn btn-save" onclick="saveData()" title="Save to JSON">💾 Save</button>
-  <button class="btn btn-primary" onclick="exportJSON()" title="Download JSON">⬇ Export</button>
-  <label class="btn btn-primary" style="margin:0" title="Import JSON">⬆ Import<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)"></label>
-  <button class="lang-btn" id="langBtn" onclick="toggleLang()">GR Ελληνικά</button>
-</div>
+  <div>
+    <h1 id="hTitle">Galatsi Residence — Construction Timeline</h1>
+    <div class="sub" id="hSub">Ipeirou 22, Galatsi · LEED Platinum · Live progress tracker</div>
+  </div>
+  <div class="header-right">
+    <div class="live-indicator"><div class="live-dot"></div><span class="live-text">LIVE</span></div>
+    <select id="unitSelect"><option value="">— Select Unit —</option></select>
+    <button class="btn btn-save" onclick="saveData()" title="Save">💾 Save</button>
+    <button class="btn btn-primary" onclick="exportJSON()" title="Download">⬇ Export</button>
+    <button class="btn btn-primary" onclick="printTimeline()" title="Print/PDF">🖨 Print</button>
+    <label class="btn btn-primary" style="margin:0" title="Import">⬆ Import<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)"></label>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">GR Ελληνικά</button>
+    <div class="last-updated" id="lastUpdated" style="font-size:11px;color:#888;"></div>
+  </div>
 </header>
 
 <div class="nav-bar" id="navBar" style="display:none">
-  <button class="btn btn-nav" id="navPrev" onclick="scrollByMonth(-1)">◂ Prev Month</button>
-  <button class="btn btn-today" id="navToday" onclick="scrollToToday()">● Today</button>
-  <button class="btn btn-nav" id="navNext" onclick="scrollByMonth(1)">Next Month ▸</button>
+  <button class="btn btn-nav" onclick="scrollByMonth(-1)">◂ Prev</button>
+  <button class="btn btn-today" onclick="scrollToToday()">● Today</button>
+  <button class="btn btn-nav" onclick="scrollByMonth(1)">Next ▸</button>
   <span class="nav-range" id="navRange"></span>
 </div>
 
 <div id="app">
-  <div class="empty-state">
-    <h2>Select a Unit</h2>
-    <p>Choose a unit from the dropdown above to view and edit its construction timeline.</p>
+  <div class="container">
+    <div class="empty-state" style="text-align:center;padding:80px 32px;color:#555">
+      <h2 style="font-size:24px;margin-bottom:12px;color:#888">Select a Unit</h2>
+      <p style="font-size:14px;max-width:400px;margin:0 auto">Choose a unit from the dropdown above.</p>
+    </div>
   </div>
 </div>
 
@@ -186,23 +213,23 @@ body.readonly-mode .lang-btn{display:block!important}
       <textarea id="edNotes" placeholder="Task notes..."></textarea>
     </div>
     <div class="editor-actions">
-      <button class="btn btn-danger" id="clearDatesBtn" onclick="clearTask()">Clear Dates</button>
-      <button class="btn btn-primary" id="cancelTaskBtn" onclick="closeEditor()">Cancel</button>
-      <button class="btn btn-save" id="saveTaskBtn" onclick="saveTask()">Save</button>
+      <button class="btn btn-danger" onclick="clearTask()">Clear</button>
+      <button class="btn btn-primary" onclick="closeEditor()">Cancel</button>
+      <button class="btn btn-save" onclick="saveTask()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Notes Editor Modal -->
+<!-- Note Editor Modal -->
 <div class="editor-overlay" id="noteOverlay">
   <div class="editor">
     <h2 id="noteEdTitle">Edit Note</h2>
     <div class="field">
-      <label id="noteLabelLbl">Label</label>
-      <input id="noteEdLabel" placeholder="e.g. Action Required, Pending Decision...">
+      <label>Label</label>
+      <input id="noteEdLabel" placeholder="e.g. Action Required...">
     </div>
     <div class="field">
-      <label id="noteTypeLbl">Type</label>
+      <label>Type</label>
       <select id="noteEdType">
         <option value="info">Info (blue)</option>
         <option value="action">Action Required (red)</option>
@@ -211,121 +238,218 @@ body.readonly-mode .lang-btn{display:block!important}
       </select>
     </div>
     <div class="field">
-      <label id="noteTextLbl">Note</label>
+      <label>Note</label>
       <textarea id="noteEdText" placeholder="Project note..." rows="4"></textarea>
     </div>
     <div class="editor-actions">
       <button class="btn btn-danger" id="noteDeleteBtn" onclick="deleteNote()" style="display:none">Delete</button>
-      <button class="btn btn-primary" id="cancelNoteBtn" onclick="closeNoteEditor()">Cancel</button>
-      <button class="btn btn-save" id="saveNoteBtn" onclick="saveNote()">Save</button>
+      <button class="btn btn-primary" onclick="closeNoteEditor()">Cancel</button>
+      <button class="btn btn-save" onclick="saveNote()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 <div class="drag-tooltip" id="dragTooltip"></div>
 
 <script>
-// ── Data ──
+// === DATA ===
 var DATA = null;
 var CURRENT_UNIT = null;
 var EDITING_TASK = null;
-var DATA_URL = 'luminara-units.json';
-var DATA_KEY = 'galatsi-timeline-data';
+var EDITING_NOTE = null;
+var DATA_URL = 'galatsi-residence-units.json';
+var DATA_KEY = 'galatsi-residence-data';
+var LANG = 'en';
 
-// ── Config ──
+// === CONFIG ===
 var TS = new Date('2026-01-01');
 var TE = new Date('2026-12-31');
 var TD = (TE - TS) / 86400000;
 var MONTHS = [];
+buildMonths();
 
-function buildInitialMonths(){
+// === GREEK NOTE TRANSLATIONS ===
+var NOTE_LABELS_EL = {
+  'smartHome':'ΈΞΥΠΝΟ ΣΠΊΤΙ',
+  'smarthome':'ΈΞΥΠΝΟ ΣΠΊΤΙ',
+  'leed':'LEED PLATINUM',
+  'pendingdecision':'ΕΚΚΡΕΜΕΊ ΑΠΌΦΑΣΗ',
+  'kitchendesignandchoi':'ΣΧΕΔΙΑΣΜΌΣ ΚΟΥΖΊΝΑΣ',
+  'floorselection':'ΕΠΙΛΟΓΉ ΔΑΠΈΔΟΥ',
+  'bathroomfixturesandti':'ΕΊΔΗ ΥΓΙΕΙΝΉΣ & ΠΛΆΚΕΣ',
+  'bathroomfixturesandtiles':'ΕΊΔΗ ΥΓΙΕΙΝΉΣ & ΠΛΆΚΕΣ',
+  'action':'ΑΠΑΙΤΕΊΤΑΙ ΕΝΈΡΓΕΙΑ',
+  'paint':'ΕΚΚΡΕΜΕΊ ΑΠΌΦΑΣΗ',
+  'facade':'ΠΡΌΣΟΨΗ',
+  'ev':'ΦΌΡΤΙΣΗ EV'
+};
+var NOTE_TEXTS_EL = {
+  'smartHome':'Όλα τα στοιχεία έξυπνου σπιτιού παραγγελμένα. Απαιτείται συνεδρία ρύθμισης πριν τη μετακόμιση. Ο πελάτης πρέπει να είναι παρών.',
+  'smarthome':'Όλα τα στοιχεία έξυπνου σπιτιού παραγγελμένα. Απαιτείται συνεδρία ρύθμισης πριν τη μετακόμιση. Ο πελάτης πρέπει να είναι παρών.',
+  'leed':'Η πιστοποίηση υποβάλλεται ως πλήρες πακέτο στο τέλος της κατασκευής. Ενεργειακοί έλεγχοι σε 6μήνο, 12μήνο, 3έτος, 5έτος.',
+  'pendingdecision':'Τα χρώματα εσωτερικής βαφής θα επιλεγούν κατά τη συνάντηση για τα είδη υγιεινής.',
+  'kitchendesignandchoi':'Ο πελάτης πρέπει να επιλέξει κουζίνα. Ο χρόνος παράδοσης μετά την παραγγελία είναι 2 έως 3 μήνες από τον κατασκευαστή.',
+  'floorselection':'Ο πελάτης πρέπει να επιλέξει δάπεδο',
+  'bathroomfixturesandti':'Απαιτείται επιλογή ειδών υγιεινής και πλακετών',
+  'bathroomfixturesandtiles':'Απαιτείται επιλογή ειδών υγιεινής και πλακετών',
+  'action':'Η συνάντηση επιλογής ειδών υγιεινής με τον Φατούρο/Διάκατο πρέπει να προγραμματιστεί άμεσα. Κρίσιμη διαδρομή για την παράδοση Μαΐου.',
+  'paint':'Τα χρώματα εσωτερικής βαφής θα επιλεγούν κατά τη συνάντηση για τα είδη υγιεινής.',
+  'facade':'Εξωτερική πρόσοψη: βαμμένη επιφάνεια Η επένδυση PVC - απαιτείται απόφαση.',
+  'ev':'Αποκλειστικός σταθμός φόρτισης EV που περιλαμβάνεται στο πεδίο εφαρμογής υπογείου/πάρκινγκ.'
+};
+
+// === GREEK TASK TRANSLATIONS ===
+var TASK_NAMES_EL = {
+  't1':'Φέρων Οργανισμός / Κέλυφος',
+  't2':'Υδατοστεγάνωση & Μόνωση',
+  't16':'Κάγκελα Μπαλκονιού & Τζάμι',
+  't15':'Εξωτερική Πρόσοψη / Βαφή',
+  'hvac':'Κλιματισμός / Multi-Floor',
+  'hrv':'Σύστημα HRV Ανάκτησης Ενέργειας',
+  't10':'Υδραυλικά - Τελικές Συνδέσεις',
+  't11':'Ηλεκτρολογικά - Τελικό 50%',
+  't19':'Συστήματα Πυρασφάλειας',
+  't20':'Ασφάλεια / Θυροτηλέφωνο / Έξυπνο Σπίτι',
+  't6':'Γυψοσανίδα - Κλείσιμο 2ης Παρειάς',
+  't7':'Δάπεδα',
+  't8':'Κουζίνα & Πάγκοι',
+  't9':'Είδη Υγιεινής & Αξεσουάρ',
+  't14':'Εσωτερική Βαφή',
+  't4':'Εξωτερικές Πόρτες',
+  't5':'Εσωτερικές Πόρτες',
+  't3':'Κουφώματα & Εξωτερικό Υαλοστάσιο',
+  't13':'Ανελκυστήρας - Kleeman',
+  't18':'Πάρκινγκ / Υπόγειο / Φόρτιση EV',
+  't17':'Κοινόχρηστοι Χώροι',
+  'pv':'Φωτοβολταϊκά & Μπαταρία',
+  'pent':'7ος Όροφος / Penthouse',
+  't24':'Βαθύς Καθαρισμός & Δοκιμή',
+  't23':'Τελικοί Έλεγχοι & Άδειες',
+  't22':'Υποβολή LEED Platinum',
+  't21':'Εξωτερικός Φωτισμός & Περιβάλλον'
+};
+
+var TASK_NOTES_EL = {
+  't1':'Σκυρόδεμα, τοιχοποιία, ανοίγματα',
+  't2':'Εξωτερική + μπαλκόνι + υγροί χώροι',
+  't16':'Γυάλινα κάγκελα Exalco',
+  't15':'Βαφή ή PVC - Εκκρεμεί απόφαση',
+  'hvac':'Ενδοδαπέδιο, αντλία θερμότητας, fan coil - ξεκλειδώνει δάπεδα',
+  'hrv':'Μονάδες οροφής + αγωγοί',
+  't10':'Μετά HVAC + δάπεδα',
+  't11':'Διακόπτες, πίνακες, έξυπνο σπίτι, φωτισμός',
+  't19':'Ανιχνευτές καπνού, πυροσβεστήρες, φωτισμός ασφαλείας',
+  't20':'Κλιμακωτά - μονάδα έτοιμη Απρίλιο',
+  't6':'Μετά υδραυλικά + ηλεκτρολογικά rough-in',
+  't7':'Μετά HVAC ολοκληρωμένο - επιλογή πελάτη',
+  't8':'4 ημέρες - μετά δάπεδα ολοκληρωμένα',
+  't9':'Απαιτείται συνάντηση επιλογής - ΚΡΙΣΙΜΗ ΔΙΑΔΡΟΜΗ',
+  't14':'4 ημέρες - μετά κουφώματα εγκατεστημένα',
+  't4':'Παραγγελμένα - παράδοση αρχές Απριλίου',
+  't5':'Παραγγελμένες - 2 ημέρες τοποθέτηση',
+  't3':'Exalco - παράδοση τέλος Απριλίου, 5 ημέρες',
+  't13':'5 ημέρες εγκατάσταση',
+  't18':'Σταθμός EV για Φατούρο που περιλαμβάνεται',
+  't17':'Χώρος υποδοχής, διάδρομοι, κλιμακοστάσιο',
+  'pv':'Δεν επηρεάζει παράδοση μονάδας',
+  'pent':'Μεζονέτα 160τ.μ. - ανεξάρτητη',
+  't24':'1 εβδομάδα πριν παράδοση',
+  't23':'Επιθεωρητής Πολεοδομίας - εμείς προγραμματίζουμε',
+  't22':'Τέλος κατασκευής - πλήρες πακέτο',
+  't21':'Κλιμακωτά Μάιος-Ιούλιος'
+};
+
+function buildMonths(){
   MONTHS = [];
   var d = new Date(TS.getFullYear(), TS.getMonth(), 1);
-  var endMonth = new Date(TE.getFullYear(), TE.getMonth(), 1);
-  while(d <= endMonth){
-    MONTHS.push(d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}));
-    d.setMonth(d.getMonth() + 1);
-  }
+  var end = new Date(TE.getFullYear(), TE.getMonth(), 1);
+  while(d <= end){ MONTHS.push(d.toLocaleDateString('en-GB',{month:'short',year:'numeric'})); d.setMonth(d.getMonth()+1); }
 }
-buildInitialMonths();
 
 function lft(d){return(((new Date(d)-TS)/86400000)/TD*100).toFixed(2)+'%';}
 function wid(s,e){return(((new Date(e)-new Date(s))/86400000)/TD*100).toFixed(2)+'%';}
 function pct(d){return((new Date(d)-TS)/86400000/TD*100).toFixed(2);}
-function fmt(d){return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+function fmt(d){return new Date(d).toLocaleDateString(LANG==='el'?'el-GR':'en-GB',{day:'numeric',month:'short'});}
 function todayPct(){return pct(new Date());}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ── Init ──
+// === ICONS FOR TASKS ===
+var TASK_ICONS = {
+  t1:'🏗️',t2:'🛡️',t16:'🔩',t15:'🎨',
+  hvac:'♨️',hrv:'💨',t10:'🔧',t11:'⚡',t19:'🚒',t20:'🔐',
+  t6:'🧱',t7:'🪵',t8:'🍳',t9:'🚿',t14:'🖌️',
+  t4:'🚪',t5:'🚪',t3:'🪟',
+  t13:'🛗',t18:'🚗',t17:'🏢',pv:'☀️',pent:'🏗️',
+  t24:'🧹',t23:'📋',t22:'🌿',t21:'💡'
+};
+
+// === PROCUREMENT ITEMS ===
+var PROCUREMENT_EN = [
+  {name:'Windows & Exterior Glazing',note:'Exalco — delivery end April'},
+  {name:'Balcony Railings & Glazing',note:'Exalco — confirmed'},
+  {name:'Kitchen Units & Countertops',note:'Delivery after flooring'},
+  {name:'All Interior Doors',note:'Delivery early April'},
+  {name:'Main Entrance Door',note:'Delivery early April'},
+  {name:'Security Doors',note:'Apartment entry + building'},
+  {name:'Garage Door',note:'Confirmed'},
+  {name:'Storage Unit Doors',note:'Confirmed'},
+  {name:'LED Lighting',note:'Selected & ordered'},
+  {name:'Smart Home Systems',note:'All units ordered'},
+  {name:'Elevator — Kleeman',note:'5-day installation'},
+  {name:'7th Floor Metal Structure',note:'Penthouse — independent scope'}
+];
+var PROCUREMENT_EL = [
+  {name:'Κουφώματα & Εξωτερικό Υαλοστάσιο',note:'Exalco — παράδοση τέλος Απριλίου'},
+  {name:'Κάγκελα Μπαλκονιού & Τζάμι',note:'Exalco — επιβεβαιωμένο'},
+  {name:'Κουζίνα & Πάγκοι',note:'Παράδοση μετά τα δάπεδα'},
+  {name:'Όλες οι Εσωτερικές Πόρτες',note:'Παράδοση αρχές Απριλίου'},
+  {name:'Κεντρική Πόρτα Εισόδου',note:'Παράδοση αρχές Απριλίου'},
+  {name:'Πόρτες Ασφαλείας',note:'Είσοδος διαμερίσματος + κτιρίου'},
+  {name:'Πόρτα Γκαράζ',note:'Επιβεβαιωμένο'},
+  {name:'Πόρτες Χώρου Αποθήκευσης',note:'Επιβεβαιωμένο'},
+  {name:'Φωτισμός LED',note:'Επιλεγμένο & παραγγελμένο'},
+  {name:'Συστήματα Έξυπνου Σπιτιού',note:'Όλα παραγγελμένα'},
+  {name:'Ανελκυστήρας — Kleeman',note:'Εγκατάσταση 5 ημερών'},
+  {name:'Μεταλλική Κατασκευή 7ου Ορόφου',note:'Penthouse — ανεξάρτητο'}
+];
+
+// === INIT ===
 function init(){
-  // Check for ?gaia=1 URL param (client read-only mode)
   var params = new URLSearchParams(window.location.search);
   var gaiaMode = params.get('gaia') === '1';
-  window.IS_READONLY = gaiaMode; // Lock all editing when client mode
-  // Load from server API first, fall back to localStorage, then file
-  fetch(DATA_URL)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      DATA = data;
-      localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
-      if(gaiaMode){
-        CURRENT_UNIT = '1a'; // Gaia client's unit
-        document.getElementById('unitSelect') && (document.getElementById('unitSelect').style.display='none');
-        document.getElementById('saveBtn') && (document.getElementById('saveBtn').style.display='none');
-        document.getElementById('exportBtn') && (document.getElementById('exportBtn').style.display='none');
-        document.getElementById('importBtn') && (document.getElementById('importBtn').style.display='none');
-        document.body.classList.add('readonly-mode');
-        document.querySelector('h1').textContent = 'Gaia — Unit 1A (Gaia) Timeline';
-        document.getElementById('uiSub').textContent = 'Ipeirou 22, Galatsi | Private Client Portal';
-        renderUnit('1a');
-      } else {
-        populateSelect();
-        toast('Loaded editor');
-      }
-    })
-    .catch(function(){
-      var saved = localStorage.getItem(DATA_KEY);
-      if(saved){
-        try{
-          DATA = JSON.parse(saved);
-          if(gaiaMode){ CURRENT_UNIT='1a'; document.getElementById('unitSelect')&&(document.getElementById('unitSelect').style.display='none'); document.getElementById('saveBtn')&&(document.getElementById('saveBtn').style.display='none'); document.getElementById('exportBtn')&&(document.getElementById('exportBtn').style.display='none'); document.getElementById('importBtn')&&(document.getElementById('importBtn').style.display='none'); document.body.classList.add('readonly-mode'); document.querySelector('h1').textContent='Gaia — Unit 1A (Gaia) Timeline'; document.getElementById('uiSub').textContent='Ipeirou 22, Galatsi | Private Client Portal'; renderUnit('1a'); }
-          else { populateSelect(); toast('Loaded from local cache'); }
-          return;
-        }catch(e){}
-      }
-      fetch(DATA_URL)
-        .then(function(r){return r.json();})
-        .then(function(data){
-          DATA = data;
-          if(gaiaMode){ CURRENT_UNIT='1a'; document.getElementById('unitSelect')&&(document.getElementById('unitSelect').style.display='none'); document.getElementById('saveBtn')&&(document.getElementById('saveBtn').style.display='none'); document.getElementById('exportBtn')&&(document.getElementById('exportBtn').style.display='none'); document.getElementById('importBtn')&&(document.getElementById('importBtn').style.display='none'); document.body.classList.add('readonly-mode'); document.querySelector('h1').textContent='Gaia — Unit 1A (Gaia) Timeline'; document.getElementById('uiSub').textContent='Ipeirou 22, Galatsi | Private Client Portal'; renderUnit('1a'); }
-          else populateSelect();
-        })
-        .catch(function(){
-          document.getElementById('app').innerHTML = '<div class="empty-state"><h2>Load Error</h2><p>Could not load data. Use Import to load a file.</p></div>';
-        });
-    });
+  window.IS_READONLY = gaiaMode;
+
+  fetch(DATA_URL).then(r=>r.json()).then(data=>{
+    DATA = data;
+    localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
+    if(gaiaMode){
+      CURRENT_UNIT = '1a';
+      document.body.classList.add('readonly-mode');
+      document.querySelector('h1').textContent = 'Galatsi Residence — Unit 1A Timeline';
+      document.getElementById('hSub').textContent = 'Private Client Portal · Ipeirou 22, Galatsi';
+      renderUnit('1a');
+    } else {
+      populateSelect();
+      toast('Loaded');
+    }
+  }).catch(()=>{
+    var saved = localStorage.getItem(DATA_KEY);
+    if(saved){ DATA = JSON.parse(saved); populateSelect(); toast('Loaded from cache'); }
+  });
 }
 
 function populateSelect(){
   var sel = document.getElementById('unitSelect');
   sel.innerHTML = '<option value="">— Select Unit —</option>';
-  var ids = Object.keys(DATA.units);
-  for(var i=0;i<ids.length;i++){
-    var u = DATA.units[ids[i]];
-    var label = u.name + ' (Floor ' + u.floor + ', ' + (u.size_m2||'?') + ' m²)';
-    var opt = document.createElement('option');
-    opt.value = ids[i];
-    opt.textContent = label;
-    sel.appendChild(opt);
-  }
-  sel.onchange = function(){
-    if(sel.value){renderUnit(sel.value);}
-    else{document.getElementById('app').innerHTML='<div class="empty-state"><h2>Select a Unit</h2><p>Choose a unit from the dropdown above.</p></div>';}
-  };
+  Object.keys(DATA.units).forEach(id=>{
+    var u = DATA.units[id];
+    sel.innerHTML += '<option value="'+id+'">'+u.name+' (Floor '+u.floor+')</option>';
+  });
+  sel.onchange = function(){ if(sel.value) renderUnit(sel.value); };
 }
 
-// ── Render Unit ──
+// === RENDER ===
 function renderUnit(uid){
   CURRENT_UNIT = uid;
   var unit = DATA.units[uid];
@@ -333,208 +457,186 @@ function renderUnit(uid){
   var tasks = unit.tasks || {};
   var tp = todayPct();
 
-  // Count statuses
+  // Count
   var counts={complete:0,inprogress:0,pending:0,blocked:0,critical:0,total:0};
-  var taskIds = Object.keys(tasks);
-  for(var i=0;i<taskIds.length;i++){
-    var st = tasks[taskIds[i]].st||'pending';
-    if(counts[st]!==undefined) counts[st]++;
-    counts.total++;
-  }
-  // Per-task weighted progress
-  var tw = DATA.taskWeights || {};
-  var pctComplete = 0;
-  for(var tid in tw){
-    if(!tasks[tid]) continue;
-    var st = tasks[tid].st || 'pending';
-    if(st==='complete') pctComplete += tw[tid];
-    else if(st==='inprogress') pctComplete += tw[tid]*0.5;
-  }
-  pctComplete = Math.round(pctComplete);
+  Object.values(tasks).forEach(t=>{ if(counts[t.st]!==undefined) counts[t.st]++; counts.total++; });
 
-  var html = '';
-
-  // Unit info editor
-  html += '<div class="container"><div class="unit-info">';
-  html += '<div class="field"><label id="unitNameLbl">Unit Name</label><input id="unitNameVal" value="'+esc(unit.name)+'" onchange="updateUnitField(\'name\',this.value)"></div>';
-  html += '<div class="field"><label id="unitClientLbl">Client</label><input id="unitClientVal" value="'+esc(unit.client)+'" onchange="updateUnitField(\'client\',this.value)"></div>';
-  html += '<div class="field"><label id="unitFloorLbl">Floor</label><input id="unitFloorVal" value="'+esc(unit.floor)+'" onchange="updateUnitField(\'floor\',this.value)"></div>';
-  html += '<div class="field"><label id="unitSizeLbl">Size (m²)</label><input id="unitSizeVal" type="number" value="'+(unit.size_m2||'')+'" onchange="updateUnitField(\'size_m2\',this.value?parseInt(this.value):null)"></div>';
-  html += '<div class="field"><label id="unitHandoverLbl">Handover</label><input id="unitHandoverVal" value="'+esc(unit.handover)+'" onchange="updateUnitField(\'handover\',this.value)"></div>';
-  html += '<div class="field"><label id="unitHandoverDateLbl">Handover Date</label><input id="unitHandoverDateVal" type="date" value="'+(unit.handoverDate||'')+'" onchange="updateUnitField(\'handoverDate\',this.value||null)"></div>';
-  html += '</div>';
+  var html = '<div class="container">';
 
   // Stats
   html += '<div class="stats">';
-  html += '<div class="stat"><div class="slabel" data-i18n="progress">Progress</div><div class="svalue" style="color:'+(pctComplete>=80?'#4dba78':pctComplete>=40?'#f0a830':'#7878c0')+'">'+pctComplete+'%</div><div class="ssub">'+counts.complete+' of '+counts.total+' tasks</div></div>';
-  html += '<div class="stat"><div class="slabel" data-i18n="inprogress">'+(LANG==='el'?'Σε Εξέλιξη':'In Progress')+'</div><div class="svalue" style="color:#f0a830">'+counts.inprogress+'</div><div class="ssub" data-i18n="activeTrades">'+(LANG==='el'?'Ενεργά συνεργεία':'Active trades')+'</div></div>';
-  html += '<div class="stat"><div class="slabel" data-i18n="criticalblocked">'+(LANG==='el'?'Κρίσιμα / Μπλοκαρισμένα':'Critical / Blocked')+'</div><div class="svalue" style="color:#f05070">'+(counts.critical+counts.blocked)+'</div><div class="ssub" data-i18n="needAttention">'+(LANG==='el'?'Χρειάζεται προσοχή':'Need attention')+'</div></div>';
-  html += '<div class="stat"><div class="slabel" data-i18n="scheduled">'+(LANG==='el'?'Προγραμματισμένα':'Scheduled')+'</div><div class="svalue" style="color:#7878c0">'+counts.pending+'</div><div class="ssub" data-i18n="upcoming">'+(LANG==='el'?'Επόμενες εργασίες':'Upcoming events')+'</div></div>';
+  html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Κατάσταση':'Status')+'</div><div class="svalue" style="color:#f0a830">'+(LANG==='el'?'Σε Εξέλιξη':'In Progress')+'</div><div class="ssub">'+(LANG==='el'?'Πολλά συνεργεία ενεργά':'Multiple trades active')+'</div></div>';
+  html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Μονάδα':'Unit')+'</div><div class="svalue">'+esc(unit.name)+'</div><div class="ssub">Floor '+unit.floor+' · '+(unit.size_m2||108)+' m²</div></div>';
+  html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Πιστοποίηση':'Certification')+'</div><div class="svalue" style="color:#4dba78">LEED</div><div class="ssub">'+(LANG==='el'?'Στόχος Platinum':'Platinum target')+'</div></div>';
+  html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Παράδοση':'Handover')+'</div><div class="svalue">'+(LANG==='el'?'Αρχές Μαΐου':'Early May')+'</div><div class="ssub">2026</div></div>';
   html += '</div>';
 
   // Legend
   html += '<div class="legend">';
-  html += '<div class="legend-item"><div class="legend-dot" style="background:#22663d;border:1px solid #2d8a52"></div><span data-i18n="complete">Complete</span></div>';
-  html += '<div class="legend-item"><div class="legend-dot" style="background:#5a4010;border:1px solid #8a6420"></div><span data-i18n="inprogress2">In Progress</span></div>';
-  html += '<div class="legend-item"><div class="legend-dot" style="background:#252545;border:1px solid #353560"></div><span data-i18n="scheduled2">Scheduled</span></div>';
-  html += '<div class="legend-item"><div class="legend-dot" style="background:#5a1830;border:1px solid #8a2040"></div><span data-i18n="critical">Critical</span></div>';
-  html += '<div class="legend-item"><div class="legend-dot" style="background:#5a3010;border:1px solid #8a5020"></div><span data-i18n="blocked">Blocked</span></div>';
+  html += '<div class="legend-item"><div class="legend-dot" style="background:#22663d;border:1px solid #2d8a52"></div><span>'+(LANG==='el'?'Ολοκληρώθηκε':'Complete')+'</span></div>';
+  html += '<div class="legend-item"><div class="legend-dot" style="background:#5a4010;border:1px solid #8a6420"></div><span>'+(LANG==='el'?'Σε Εξέλιξη':'In Progress')+'</span></div>';
+  html += '<div class="legend-item"><div class="legend-dot" style="background:#252545;border:1px solid #353560"></div><span>'+(LANG==='el'?'Προγραμματισμένο':'Scheduled')+'</span></div>';
+  html += '<div class="legend-item"><div class="legend-dot" style="background:#5a1830;border:1px solid #8a2040"></div><span>'+(LANG==='el'?'Κρίσιμη Διαδρομή':'Critical')+'</span></div>';
+  html += '<div class="legend-item"><div class="legend-dot" style="background:#5a3010;border:1px solid #8a5020"></div><span>'+(LANG==='el'?'Αποκλεισμένο':'Blocked')+'</span></div>';
+  html += '<div class="legend-item"><div class="legend-dot" style="background:#14512e;border:1px solid #1d7a44"></div><span>'+(LANG==='el'?'Παραγγελμένο':'Ordered')+'</span></div>';
   html += '</div>';
+
+  // Procurement Grid
+  html += '<div class="procurement-grid">';
+  var PROCUREMENT = LANG==='el' ? PROCUREMENT_EL : PROCUREMENT_EN;
+  html += '<div class="procurement-header"><div><div class="procurement-title">'+(LANG==='el'?'Κατάσταση Προμήθειας':'Procurement Status')+'</div><div class="procurement-sub">'+(LANG==='el'?'Όλα παραγγελμένα, επιβεβαιωμένα & σε παραγωγή':'All items ordered, confirmed & in production')+'</div></div><div class="procurement-badge">'+PROCUREMENT.length+' Items Ordered</div></div>';
+  html += '<div class="procurement-items">';
+  PROCUREMENT.forEach(p=>{
+    html += '<div class="procurement-item"><div class="procurement-check">✓</div><div><div class="procurement-item-name">'+p.name+'</div><div class="procurement-item-note">'+p.note+'</div></div></div>';
+  });
+  html += '</div></div>';
 
   // Gantt
   html += '<div class="gantt-wrap"><div class="gantt-inner">';
   html += '<div class="gantt-header-row"><div class="gh-label">Task</div><div class="gh-months">';
-  for(var m=0;m<MONTHS.length;m++) html += '<div class="gh-month">'+MONTHS[m]+'</div>';
+  // Render months with width proportional to days
+  for(var mi=0;mi<12;mi++){
+    var monthStart = new Date(2026, mi, 1);
+    var monthEnd = new Date(2026, mi+1, 0); // Last day of month
+    var nextMonthStart = new Date(2026, mi+1, 1);
+    var monthWid = wid(monthStart.toISOString().slice(0,10), nextMonthStart.toISOString().slice(0,10));
+    var monthLeft = lft(monthStart.toISOString().slice(0,10));
+    html+='<div class="gh-month" style="position:absolute;left:'+monthLeft+';width:'+monthWid+'">'+MONTHS[mi]+'</div>';
+  }
   html += '</div></div>';
 
-  for(var j=0;j<tmpl.length;j++){
-    var t = tmpl[j];
+  tmpl.forEach(t=>{
     if(t.sec !== undefined){
-      html += '<div class="section-hdr"><span class="section-hdr-label">'+t.sec+'</span></div>';
-      continue;
+      var secLabel = t.sec;
+      if(LANG==='el'){
+        var grSecs = ['Δομή & Κέλυφος','ΜΗΧ - Μηχανολογικά, Ηλεκτρολογικά, Υδραυλικά','Εσωτερικές Φινιρίσεις','Πόρτες, Κουφώματα & Ανοίγματα','Συστήματα Κτιρίου','Ακολουθία Παράδοσης'];
+        var enSecs = ['Structure & Envelope','MEP - Mechanical, Electrical, Plumbing','Interior Finishes','Doors, Windows & Openings','Building-Wide Systems','Handover Sequence'];
+        var idx = enSecs.indexOf(t.sec);
+        if(idx >= 0) secLabel = grSecs[idx];
+      }
+      html += '<div class="section-hdr"><span class="section-hdr-label">'+secLabel+'</span></div>';
+      return;
     }
     var task = tasks[t.id] || {};
     var st = task.st || 'pending';
     var s = task.s || '';
     var e = task.e || '';
     var nt = task.nt || 'Click to set dates';
-    var hasDates = s && e;
+    var icon = TASK_ICONS[t.id] || '';
+    var taskName = (LANG==='el' && TASK_NAMES_EL[t.id]) ? TASK_NAMES_EL[t.id] : t.nm;
+    var taskNote = (LANG==='el' && TASK_NOTES_EL[t.id]) ? TASK_NOTES_EL[t.id] : nt;
+    if(LANG==='el' && nt === 'Click to set dates') taskNote = 'Κάντε κλικ για να ορίσετε ημερομηνίες';
 
     html += '<div class="task-row">';
-    html += '<div class="task-label"><div><div class="task-name" data-tid="'+t.id+'">'+esc(t.nm)+'</div><div class="task-note" data-tidn="'+t.id+'">'+esc(nt)+'</div></div></div>';
+    html += '<div class="task-label">';
+    if(icon) html += '<span class="task-icon">'+icon+'</span>';
+    html += '<div><div class="task-name">'+esc(taskName)+'</div><div class="task-note">'+esc(taskNote)+'</div></div></div>';
     html += '<div class="task-timeline"><div class="today-line" style="left:'+tp+'%"></div>';
-    if(hasDates){
-      var barLabel = st==='complete'?'Done':st==='critical'?'Action Required':'';
-      html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-main">'+barLabel+'</span><span class="bar-date">'+fmt(s)+' → '+fmt(e)+'</span><div class="handle handle-right"></div></div>';
+    // Add month grid lines at actual month boundaries
+    for(var m=1;m<=12;m++){
+      var monthStart = new Date(2026, m, 1); // First day of each month (0-indexed months)
+      if(monthStart <= TE){
+        var linePct = pct(monthStart.toISOString().slice(0,10));
+        html += '<div class="month-grid-line" style="left:'+linePct+'%"></div>';
+      }
+    }
+    if(s && e){
+      var dateStr = fmt(s)+' → '+fmt(e);
+      // Calculate bar width as percentage of timeline
+      var barPct = parseFloat(wid(s,e));
+      // If bar spans more than 5% of timeline (~18 days), show dates inside
+      var showDatesInside = barPct > 5;
+      
+      if(!showDatesInside){
+        // Short tasks: Dates outside, before the bar
+        html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(s)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+dateStr+'</div>';
+        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div></div>';
+      } else {
+        // Longer tasks: Dates centered inside the bar
+        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div></div>';
+      }
     } else {
-      html += '<div style="position:absolute;top:50%;transform:translateY(-50%);left:16px;font-size:11px;color:#444;cursor:pointer" onclick="openEditor(\''+t.id+'\')">+ Click to set dates</div>';
+      var clickText = LANG==='el' ? '+ Κάντε κλικ για να ορίσετε ημερομηνίες' : '+ Click to set dates';
+      html += '<div style="position:absolute;top:50%;transform:translateY(-50%);left:16px;font-size:11px;color:#444;cursor:pointer" onclick="openEditor(\''+t.id+'\')">'+clickText+'</div>';
     }
     html += '</div></div>';
-  }
-  html += '</div></div>'; // gantt-inner + gantt-wrap
-
-  // Handover panel
-  html += '<div class="handover-panel"><div><h3 id="hvTitle">Key Handover — '+esc(unit.name)+'</h3><p id="hvSub">Professional cleaning complete — Smart home configured — All systems commissioned</p></div>';
-  var handoverDisplay = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'TBD');
-  html += '<div class="hdate" id="hvDate">'+esc(handoverDisplay)+'</div></div>';
-
-  // Notes section
-  var notes = unit.notes || {};
-  var noteKeys = Object.keys(notes);
-  var noteTypes = {action:'action',paint:'warning',facade:'warning',ev:'info',smartHome:'info',leed:'info'};
-  var noteLabels = {action:'Action Required',paint:'Pending Decision',facade:'Pending Decision',ev:'EV Charging',smartHome:'Smart Home',leed:'LEED Platinum'};
-  var noteMeta = unit._noteMeta || {};
-  html += '<div class="notes-section"><h3 id="notesTitle">Project Notes <button class="btn btn-primary" id="addNoteBtn" style="padding:4px 12px;font-size:11px" onclick="openNoteEditor()">+ Add Note</button></h3><div class="notes-grid">';
-  for(var n=0;n<noteKeys.length;n++){
-    var nk = noteKeys[n];
-    if(!notes[nk]) continue;
-    var nType = (noteMeta[nk] && noteMeta[nk].type) || noteTypes[nk] || 'info';
-    var nLabel = (noteMeta[nk] && noteMeta[nk].label) || noteLabels[nk] || nk;
-    html += '<div class="note-card" data-notekey="'+esc(nk)+'" onclick="openNoteEditor(\''+esc(nk)+'\')"><div class="note-tag '+nType+'">'+esc(nLabel)+'</div><p>'+esc(notes[nk])+'</p></div>';
-  }
-  html += '<div class="note-add" onclick="openNoteEditor()">+ Add Project Note</div>';
+  });
   html += '</div></div>';
 
-  html += '</div>'; // container
+  // Handover
+  html += '<div class="handover-panel"><div><h3>'+(LANG==='el'?'Παράδοση Κλειδιών':'Key Handover')+' — '+esc(unit.name)+'</h3><p>'+(LANG==='el'?'Επαγγελματικός καθαρισμός · Έξυπνο σπίτι · Πλήρης έλεγχος':'Professional cleaning · Smart home configured · All systems commissioned')+'</p></div>';
+  var hd = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'Early May 2026');
+  html += '<div class="hdate">'+esc(hd)+'</div></div>';
+
+  // Notes
+  var notes = unit.notes || {};
+  var noteMeta = unit._noteMeta || {};
+  html += '<div class="notes-section"><h3>'+(LANG==='el'?'Σημειώσεις Έργου':'Project Notes')+' <button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="openNoteEditor()">+ Add</button></h3><div class="notes-grid">';
+  Object.keys(notes).forEach(nk=>{
+    if(!notes[nk]) return;
+    var nType = (noteMeta[nk]&&noteMeta[nk].type) || 'info';
+    var nLabel = (noteMeta[nk]&&noteMeta[nk].label) || nk;
+    var nText = notes[nk];
+    if(LANG==='el'){
+      nLabel = NOTE_LABELS_EL[nk] || nLabel;
+      nText = NOTE_TEXTS_EL[nk] || nText;
+    }
+    html += '<div class="note-card" data-notekey="'+esc(nk)+'" onclick="openNoteEditor(\''+esc(nk)+'\')"><div class="note-tag '+nType+'">'+esc(nLabel)+'</div><p>'+esc(nText)+'</p></div>';
+  });
+  html += '<div class="note-add" onclick="openNoteEditor()">+ Add Note</div>';
+  html += '</div><div class="notes-custom"><textarea id="customNotes" placeholder="'+(LANG==='el'?'Προσθέστε σημειώσεις...':'Add notes...')+'"></textarea></div></div>';
+
+  html += '</div>';
 
   document.getElementById('app').innerHTML = html;
-  var navBar = document.getElementById('navBar');
-  if(navBar) navBar.style.display = 'flex';
+  document.getElementById('navBar').style.display = 'flex';
   updateNavRange();
+  updateLastUpdated();
   setTimeout(scrollToToday, 100);
   enableDragScroll();
   enableBarDrag();
 }
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-// ── Unit field update ──
-function updateUnitField(field, value){
-  if(!CURRENT_UNIT) return;
-  DATA.units[CURRENT_UNIT][field] = value;
-  autoSave();
-}
-
-// ── Task Editor ──
-function openEditor(taskId){
-  if(!CURRENT_UNIT) return;
-  EDITING_TASK = taskId;
-  var unit = DATA.units[CURRENT_UNIT];
-  var task = (unit.tasks||{})[taskId] || {};
-  var tmpl = DATA.taskTemplate.filter(function(t){return t.id===taskId;})[0];
-
-  document.getElementById('edTitle').textContent = tmpl ? tmpl.nm : taskId;
-  document.getElementById('edTaskId').textContent = 'ID: ' + taskId;
+// === EDITORS ===
+function openEditor(tid){
+  if(!CURRENT_UNIT || window.IS_READONLY) return;
+  EDITING_TASK = tid;
+  var task = (DATA.units[CURRENT_UNIT].tasks||{})[tid] || {};
+  var tmpl = DATA.taskTemplate.find(t=>t.id===tid);
+  document.getElementById('edTitle').textContent = tmpl ? tmpl.nm : tid;
+  document.getElementById('edTaskId').textContent = 'ID: ' + tid;
   document.getElementById('edStatus').value = task.st || 'pending';
   document.getElementById('edStart').value = task.s || '';
   document.getElementById('edEnd').value = task.e || '';
   document.getElementById('edNotes').value = task.nt || '';
-
   document.getElementById('editorOverlay').classList.add('active');
 }
-
-function closeEditor(){
-  document.getElementById('editorOverlay').classList.remove('active');
-  EDITING_TASK = null;
-}
-
+function closeEditor(){ document.getElementById('editorOverlay').classList.remove('active'); EDITING_TASK = null; }
 function saveTask(){
   if(!CURRENT_UNIT || !EDITING_TASK) return;
   if(!DATA.units[CURRENT_UNIT].tasks) DATA.units[CURRENT_UNIT].tasks = {};
-
   var s = document.getElementById('edStart').value;
   var e = document.getElementById('edEnd').value;
-  var st = document.getElementById('edStatus').value;
-  var nt = document.getElementById('edNotes').value;
-
-  if(s && e && new Date(e) < new Date(s)){
-    toast('End date must be after start date', true);
-    return;
-  }
-
-  var expanded = false;
-  if(s) expanded = ensureTimelineRange(s) || expanded;
-  if(e) expanded = ensureTimelineRange(e) || expanded;
-
-  DATA.units[CURRENT_UNIT].tasks[EDITING_TASK] = {
-    st: st,
-    s: s,
-    e: e,
-    nt: nt || 'TBD'
-  };
-
-  closeEditor();
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  toast('Task saved');
+  if(s && e && new Date(e) < new Date(s)){ toast('End must be after start', true); return; }
+  DATA.units[CURRENT_UNIT].tasks[EDITING_TASK] = {st:document.getElementById('edStatus').value,s:s,e:e,nt:document.getElementById('edNotes').value||'TBD'};
+  closeEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Saved');
 }
-
 function clearTask(){
   if(!CURRENT_UNIT || !EDITING_TASK) return;
   delete DATA.units[CURRENT_UNIT].tasks[EDITING_TASK];
-  closeEditor();
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  toast('Task cleared');
+  closeEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Cleared');
 }
 
-// ── Note Editor ──
-var EDITING_NOTE = null;
-
-function openNoteEditor(noteKey){
-  if(!CURRENT_UNIT) return;
+function openNoteEditor(nk){
+  if(!CURRENT_UNIT || window.IS_READONLY) return;
+  EDITING_NOTE = nk || null;
   var unit = DATA.units[CURRENT_UNIT];
-  if(!unit.notes) unit.notes = {};
-  EDITING_NOTE = noteKey || null;
-
-  var noteTypes = {action:'action',paint:'warning',facade:'warning',ev:'info',smartHome:'info',leed:'info'};
-  var noteLabels = {action:'Action Required',paint:'Pending Decision',facade:'Pending Decision',ev:'EV Charging',smartHome:'Smart Home',leed:'LEED Platinum'};
-
-  if(noteKey && unit.notes[noteKey]){
+  if(nk && unit.notes && unit.notes[nk]){
+    var meta = (unit._noteMeta||{})[nk] || {};
     document.getElementById('noteEdTitle').textContent = 'Edit Note';
-    document.getElementById('noteEdLabel').value = noteLabels[noteKey] || noteKey;
-    document.getElementById('noteEdType').value = noteTypes[noteKey] || 'info';
-    document.getElementById('noteEdText').value = unit.notes[noteKey];
+    document.getElementById('noteEdLabel').value = meta.label || nk;
+    document.getElementById('noteEdType').value = meta.type || 'info';
+    document.getElementById('noteEdText').value = unit.notes[nk];
     document.getElementById('noteDeleteBtn').style.display = '';
   } else {
     document.getElementById('noteEdTitle').textContent = 'Add Note';
@@ -545,358 +647,160 @@ function openNoteEditor(noteKey){
   }
   document.getElementById('noteOverlay').classList.add('active');
 }
-
-function closeNoteEditor(){
-  document.getElementById('noteOverlay').classList.remove('active');
-  EDITING_NOTE = null;
-}
-
+function closeNoteEditor(){ document.getElementById('noteOverlay').classList.remove('active'); EDITING_NOTE = null; }
 function saveNote(){
   if(!CURRENT_UNIT) return;
   var label = document.getElementById('noteEdLabel').value.trim();
-  var type = document.getElementById('noteEdType').value;
   var text = document.getElementById('noteEdText').value.trim();
-  if(!label || !text){
-    toast('Label and note text required', true);
-    return;
-  }
+  if(!label || !text){ toast('Label and text required', true); return; }
   if(!DATA.units[CURRENT_UNIT].notes) DATA.units[CURRENT_UNIT].notes = {};
-
-  // If editing existing, delete old key first
-  if(EDITING_NOTE){
-    delete DATA.units[CURRENT_UNIT].notes[EDITING_NOTE];
-  }
-
-  // Use label as key (lowercase, no spaces)
+  if(!DATA.units[CURRENT_UNIT]._noteMeta) DATA.units[CURRENT_UNIT]._noteMeta = {};
+  if(EDITING_NOTE) delete DATA.units[CURRENT_UNIT].notes[EDITING_NOTE];
   var key = label.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20) || ('note'+Date.now());
   DATA.units[CURRENT_UNIT].notes[key] = text;
-
-  // Store label/type mapping in a meta object
-  if(!DATA.units[CURRENT_UNIT]._noteMeta) DATA.units[CURRENT_UNIT]._noteMeta = {};
-  DATA.units[CURRENT_UNIT]._noteMeta[key] = {label: label, type: type};
-
-  closeNoteEditor();
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  saveData();
-  toast('Note saved');
+  DATA.units[CURRENT_UNIT]._noteMeta[key] = {label:label,type:document.getElementById('noteEdType').value};
+  closeNoteEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Note saved');
 }
-
 function deleteNote(){
   if(!CURRENT_UNIT || !EDITING_NOTE) return;
   delete DATA.units[CURRENT_UNIT].notes[EDITING_NOTE];
   if(DATA.units[CURRENT_UNIT]._noteMeta) delete DATA.units[CURRENT_UNIT]._noteMeta[EDITING_NOTE];
-  closeNoteEditor();
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  toast('Note deleted');
+  closeNoteEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Deleted');
 }
 
-// ── Save / Load ──
-function autoSave(){
-  try{localStorage.setItem('galatsi-timeline-data', JSON.stringify(DATA));}catch(e){}
-}
-
+// === SAVE/LOAD ===
+function autoSave(){ try{ localStorage.setItem(DATA_KEY, JSON.stringify(DATA)); }catch(e){} }
 function saveData(){
-  fetch('/api/save', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(DATA)
-  })
-  .then(function(r){return r.json();})
-  .then(function(result){
-    if(result.error){
-      toast('Save failed: ' + result.error, true);
-    } else {
-      localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
-      toast('Saved to server — ' + result.units + ' units');
-    }
-  })
-  .catch(function(err){
-    // Fallback: download as file
-    toast('Server save failed — downloading file instead', true);
-    var blob = new Blob([JSON.stringify(DATA, null, 2)], {type:'application/json'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'luminara-units.json';
-    a.click();
-  });
+  fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(DATA)})
+  .then(r=>r.json()).then(res=>{ if(res.error) toast('Save failed: '+res.error, true); else toast('Saved to server'); })
+  .catch(()=>{ toast('Server unavailable — saved locally', true); autoSave(); });
 }
-
 function exportJSON(){
-  saveData();
+  var blob = new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'luminara-units.json';
+  a.click();
 }
-
-function importJSON(event){
-  var file = event.target.files[0];
-  if(!file) return;
+function importJSON(e){
+  var file = e.target.files[0]; if(!file) return;
   var reader = new FileReader();
-  reader.onload = function(e){
-    try{
-      DATA = JSON.parse(e.target.result);
-      localStorage.setItem('galatsi-timeline-data', JSON.stringify(DATA));
-      populateSelect();
-      if(CURRENT_UNIT && DATA.units[CURRENT_UNIT]) renderUnit(CURRENT_UNIT);
-      toast('JSON imported successfully');
-    }catch(err){
-      toast('Invalid JSON file', true);
-    }
+  reader.onload = function(ev){
+    try{ DATA = JSON.parse(ev.target.result); localStorage.setItem(DATA_KEY,JSON.stringify(DATA)); populateSelect(); toast('Imported'); }
+    catch(err){ toast('Invalid JSON', true); }
   };
   reader.readAsText(file);
-  event.target.value = '';
+  e.target.value = '';
 }
 
-// ── Toast ──
-function toast(msg, isError){
-  var el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (isError?' error':'');
-  setTimeout(function(){el.className='toast';}, 2500);
+// === PRINT ===
+function printTimeline(){
+  var printWindow = window.open('', '_blank');
+  var unit = CURRENT_UNIT ? DATA.units[CURRENT_UNIT] : null;
+  var title = unit ? unit.name + ' — Construction Timeline' : 'Galatsi Residence — Construction Timeline';
+  var html = '<!DOCTYPE html><html><head><title>'+title+'</title><style>';
+  html += 'body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;padding:20px}';
+  html += 'h1{font-size:18px;margin-bottom:4px}h2{font-size:14px;color:#666;margin-bottom:20px}';
+  html += 'table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #ddd;padding:8px;text-align:left}';
+  html += 'th{background:#f5f5f5}.status-complete{color:#2d8a52}.status-inprogress{color:#8a6420}.status-pending{color:#666}';
+  html += '.section{background:#f0f0f0;font-weight:bold}@media print{body{padding:0}}</style></head><body>';
+  html += '<h1>'+title+'</h1>';
+  html += '<h2>Ipeirou 22, Galatsi · Generated ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) + '</h2>';
+  if(unit && unit.tasks){
+    html += '<table><tr><th>Task</th><th>Status</th><th>Start</th><th>End</th><th>Notes</th></tr>';
+    var tmpl = DATA.taskTemplate;
+    tmpl.forEach(t=>{
+      if(t.sec){ html += '<tr class="section"><td colspan="5">'+t.sec+'</td></tr>'; return; }
+      var task = unit.tasks[t.id] || {};
+      var st = task.st || 'pending';
+      html += '<tr><td>'+t.nm+'</td><td class="status-'+st+'">'+st.charAt(0).toUpperCase()+st.slice(1)+'</td>';
+      html += '<td>'+(task.s||'—')+'</td><td>'+(task.e||'—')+'</td><td>'+(task.nt||'')+'</td></tr>';
+    });
+    html += '</table>';
+  }
+  html += '</body></html>';
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.print();
 }
 
-// ── Timeline Navigation ──
+// === LAST UPDATED ===
+function updateLastUpdated(){
+  var el = document.getElementById('lastUpdated');
+  if(!el) return;
+  var now = new Date();
+  var label = LANG==='el'?'Τελευταία ενημέρωση':'Last updated';
+  el.textContent = label+': '+now.toLocaleDateString(LANG==='el'?'el-GR':'en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// === NAV ===
 function scrollToToday(){
-  var wrap = document.querySelector('.gantt-wrap');
-  if(!wrap) return;
-  var todayLine = wrap.querySelector('.today-line');
-  if(todayLine){
-    var barRect = wrap.getBoundingClientRect();
-    var lineLeft = todayLine.offsetLeft;
-    wrap.scrollTo({left: lineLeft - barRect.width/2, behavior: 'smooth'});
-  }
+  var wrap = document.querySelector('.gantt-wrap'); if(!wrap) return;
+  var line = wrap.querySelector('.today-line');
+  if(line){ var rect = wrap.getBoundingClientRect(); wrap.scrollTo({left:line.offsetLeft-rect.width/2,behavior:'smooth'}); }
 }
-
 function scrollByMonth(dir){
-  var wrap = document.querySelector('.gantt-wrap');
-  if(!wrap) return;
-  // Each month is roughly the timeline width / number of months
+  var wrap = document.querySelector('.gantt-wrap'); if(!wrap) return;
   var months = wrap.querySelector('.gh-months');
-  if(months && months.children.length > 0){
-    var monthWidth = months.children[0].offsetWidth;
-    wrap.scrollBy({left: dir * monthWidth, behavior: 'smooth'});
-  }
+  if(months && months.children[0]) wrap.scrollBy({left:dir*months.children[0].offsetWidth,behavior:'smooth'});
 }
+function updateNavRange(){ var el=document.getElementById('navRange'); if(el) el.textContent = MONTHS[0]+' — '+MONTHS[MONTHS.length-1]; }
 
-function updateNavRange(){
-  var rangeEl = document.getElementById('navRange');
-  if(!rangeEl) return;
-  var startDate = TS.toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-  var endDate = TE.toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-  rangeEl.textContent = startDate + ' — ' + endDate;
-}
+// === TOAST ===
+function toast(msg,isErr){ var el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(isErr?' error':''); setTimeout(()=>el.className='toast',2500); }
 
-// ── Auto-Expand Timeline ──
-function ensureTimelineRange(dateStr){
-  if(!dateStr) return false;
-  var d = new Date(dateStr);
-  var expanded = false;
-  if(d < TS){
-    // Extend start by going back 2 months
-    TS = new Date(d.getFullYear(), d.getMonth() - 1, 1);
-    TD = (TE - TS) / 86400000;
-    expanded = true;
-  }
-  if(d > TE){
-    // Extend end by adding 3 months
-    TE = new Date(d.getFullYear(), d.getMonth() + 4, 0);
-    TD = (TE - TS) / 86400000;
-    expanded = true;
-  }
-  if(expanded){
-    rebuildMonths();
-    updateNavRange();
-    // Expand the gantt-inner min-width
-    var inner = document.querySelector('.gantt-inner');
-    if(inner) inner.style.minWidth = (MONTHS.length * 180) + 'px';
-  }
-  return expanded;
-}
-
-function rebuildMonths(){
-  MONTHS = [];
-  var d = new Date(TS.getFullYear(), TS.getMonth(), 1);
-  var endMonth = new Date(TE.getFullYear(), TE.getMonth(), 1);
-  while(d <= endMonth){
-    MONTHS.push(d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}));
-    d.setMonth(d.getMonth() + 1);
-  }
-}
-
-// Override saveTask to trigger auto-expand
-var _saveTaskOriginal = saveTask;
-// Actually, inline the check in saveTask — see below
-
-
-// ── Greek/English Toggle ──
-var LANG='en';
-var EN_SECS=['Structure & Envelope','MEP - Mechanical, Electrical, Plumbing','Interior Finishes','Doors, Windows & Openings','Building-Wide Systems','Handover Sequence'];
-var GR_SECS=['Δομή & Κέλυφος','ΜΗΧ - Μηχανολογικά, Ηλεκτρολογικά, Υδραυλικά','Εσωτερικές Φινιρίσεις','Πόρτες, Κουφώματα & Ανοίγματα','Συστήματα Κτιρίου','Ακολουθία Παράδοσης'];
-function toggleLang(){
-  LANG = LANG==='en' ? 'el' : 'en';
-  var isEl = LANG==='el';
-  var btn=document.getElementById('langBtn');
-  if(btn) btn.textContent = isEl ? 'EN English' : 'GR Ελληνικά';
-
-  var T = isEl ? {
-    title:'Γκαλάτσι — Χρονοδιάγραμμα Κατασκευής',
-    sub:'Ιπείρου 22, Γαλάτσι',
-    prev:'◂ Προηγ. Μήνας', today:'● Σήμερα', next:'Επόμ. Μήνας ▸',
-    progress:'Πρόοδος', inprogress:'Σε Εξέλιξη', criticalblocked:'Κρίσιμα / Μπλοκαρισμένα', scheduled:'Προγραμματισμένα',
-    complete:'Ολοκληρωμένο', inprogress2:'Σε Εξέλιξη', scheduled2:'Προγραμματισμένο', critical:'Κρίσιμο', blocked:'Μπλοκαρισμένο',
-    emptyTitle:'Επιλέξτε Μονάδα', emptyBody:'Επιλέξτε μία μονάδα από το επάνω μενού.',
-    edStatusLbl:'Κατάσταση', edStartLbl:'Ημ/νία Έναρξης', edEndLbl:'Ημ/νία Λήξης', edNotesLbl:'Σημειώσεις',
-    clearDatesBtn:'Καθαρισμός Ημερομηνιών', cancelTaskBtn:'Ακύρωση', saveTaskBtn:'Αποθήκευση',
-    noteLabelLbl:'Ετικέτα', noteTypeLbl:'Τύπος', noteTextLbl:'Σημείωση', noteDeleteBtn:'Διαγραφή',
-    cancelNoteBtn:'Ακύρωση', saveNoteBtn:'Αποθήκευση',
-    notesTitle:'Σημειώσεις Έργου', addNoteBtn:'+ Προσθήκη Σημείωσης',
-    hvTitle:'Παράδοση Κλειδιών', hvSub:'Επαγγελματικός καθαρισμός — Ρύθμιση έξυπνου σπιτιού — Πλήρης έλεγχος συστημάτων',
-    unitNameLbl:'Μονάδα', unitClientLbl:'Πελάτης', unitFloorLbl:'Όροφος', unitSizeLbl:'Εμβαδό (m²)',
-    unitHandoverLbl:'Παράδοση', unitHandoverDateLbl:'Ημ/νία Παράδοσης',activeTrades:'Ενεργά συνεργεία',needAttention:'Χρειάζεται προσοχή',upcoming:'Επόμενες εργασίες'
-  } : {
-    title:'Galatsi — Construction Timeline Editor',
-    sub:'Ipeirou 22, Galatsi',
-    prev:'◂ Prev Month', today:'● Today', next:'Next Month ▸',
-    progress:'Progress', inprogress:'In Progress', criticalblocked:'Critical / Blocked', scheduled:'Scheduled',
-    complete:'Complete', inprogress2:'In Progress', scheduled2:'Scheduled', critical:'Critical', blocked:'Blocked',
-    emptyTitle:'Select a Unit', emptyBody:'Choose a unit from the dropdown above.',
-    edStatusLbl:'Status', edStartLbl:'Start Date', edEndLbl:'End Date', edNotesLbl:'Notes',
-    clearDatesBtn:'Clear Dates', cancelTaskBtn:'Cancel', saveTaskBtn:'Save',
-    noteLabelLbl:'Label', noteTypeLbl:'Type', noteTextLbl:'Note', noteDeleteBtn:'Delete',
-    cancelNoteBtn:'Cancel', saveNoteBtn:'Save',
-    notesTitle:'Project Notes', addNoteBtn:'+ Add Note',
-    hvTitle:'Key Handover', hvSub:'Professional cleaning — Smart home configured — All systems commissioned',
-    unitNameLbl:'Unit Name', unitClientLbl:'Client', unitFloorLbl:'Floor', unitSizeLbl:'Size (m²)',
-    unitHandoverLbl:'Handover', unitHandoverDateLbl:'Handover Date',activeTrades:'Active trades',needAttention:'Need attention',upcoming:'Upcoming events'
-  };
-
-  // Simple id-based swaps
-  ['uiTitle','uiSub','navPrev','navToday','navNext','emptyTitle','emptyBody',
-   'edStatusLbl','edStartLbl','edEndLbl','edNotesLbl','clearDatesBtn','cancelTaskBtn','saveTaskBtn',
-   'noteLabelLbl','noteTypeLbl','noteTextLbl','noteDeleteBtn','cancelNoteBtn','saveNoteBtn',
-   'notesTitle','hvTitle','hvSub',
-   'unitNameLbl','unitClientLbl','unitFloorLbl','unitSizeLbl','unitHandoverLbl','unitHandoverDateLbl'
-  ].forEach(function(id){ var el=document.getElementById(id); if(el&&T[id]) el.textContent=T[id]; });
-
-  var anb=document.getElementById('addNoteBtn'); if(anb&&T.addNoteBtn) anb.textContent=T.addNoteBtn;
-
-  // data-i18n
-  document.querySelectorAll('[data-i18n]').forEach(function(el){ var k=el.getAttribute('data-i18n'); if(T[k]) el.textContent=T[k]; });
-
-  if(!CURRENT_UNIT||!DATA||!DATA.units[CURRENT_UNIT]) return;
-  var unit=DATA.units[CURRENT_UNIT], tr=unit.translations||{}, nt=unit.noteTranslations||{};
-
-  // Section labels
-  var secLabels=document.querySelectorAll('.section-hdr-label');
-  var EN=['Structure & Envelope','MEP - Mechanical, Electrical, Plumbing','Interior Finishes','Doors, Windows & Openings','Building-Wide Systems','Handover Sequence'];
-  var GR=['Δομή & Κέλυφος','ΜΗΧ - Μηχανολογικά, Ηλεκτρολογικά, Υδραυλικά','Εσωτερικές Φινιρίσεις','Πόρτες, Κουφώματα & Ανοίγματα','Συστήματα Κτιρίου','Ακολουθία Παράδοσης'];
-  for(var i=0;i<secLabels.length;i++) secLabels[i].textContent = isEl ? (GR[i]||secLabels[i].textContent) : (EN[i]||secLabels[i].textContent);
-
-  // Task names + notes
-  document.querySelectorAll('.task-name').forEach(function(el){
-    var tid=el.getAttribute('data-tid'); if(!tid) return;
-    if(isEl && tr[tid]) el.textContent=tr[tid][1];
-    else { var t=DATA.taskTemplate.find(function(x){return x.id===tid}); if(t) el.textContent=t.nm; }
-  });
-  document.querySelectorAll('.task-note').forEach(function(el){
-    var tid=el.getAttribute('data-tidn'); if(!tid) return;
-    if(isEl && tr[tid]) el.textContent=tr[tid][1];
-    else { var task=(unit.tasks||{})[tid]; if(task) el.textContent=task.nt||''; }
-  });
-
-  // Note cards
-  document.querySelectorAll('.note-card').forEach(function(el){
-    var nk=el.getAttribute('data-notekey'); if(!nk) return;
-    var tag=el.querySelector('.note-tag'), pEl=el.querySelector('p');
-    if(isEl && nt.el && nt.el[nk]){ if(tag) tag.textContent=nt.el[nk].label; if(pEl) pEl.textContent=nt.el[nk].text; }
-    else if(nt.en && nt.en[nk]){ if(tag) tag.textContent=nt.en[nk].label; if(pEl) pEl.textContent=nt.en[nk].text; }
-  });
-
-  // Handover date
-  var hd=document.getElementById('hvDate');
-  if(hd){
-    hd.textContent = unit.handoverDate
-      ? new Date(unit.handoverDate).toLocaleDateString(isEl?'el-GR':'en-GB',{day:'numeric',month:'short',year:'numeric'})
-      : (unit.handover||'TBD');
-  }
-
-  // Bar date labels — re-render all bar dates in selected locale
-  document.querySelectorAll('.bar-date').forEach(function(el){
-    var bar=el.closest('.bar');
-    if(!bar||!bar.dataset.start||!bar.dataset.end) return;
-    var fmtD = function(d){ return new Date(d).toLocaleDateString(isEl?'el-GR':'en-GB',{day:'numeric',month:'short'}); };
-    el.textContent = fmtD(bar.dataset.start)+' → '+fmtD(bar.dataset.end);
-  });
-}
-// ── Keyboard shortcuts ──
-document.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){closeEditor();closeNoteEditor();}
-  if(e.key==='s' && (e.metaKey||e.ctrlKey)){e.preventDefault(); saveData();}
-});
-
-
-
-// ── Drag scroll on timeline ──
+// === DRAG SCROLL ===
 function enableDragScroll(){
-  if(window.IS_READONLY) return; // No drag scrolling for client mode (normal scroll works)
-  var wrap=document.querySelector('.gantt-wrap');
-  if(!wrap) return;
-  var isDown=false,startX=0,scrollLeft=0,target=null;
-  wrap.addEventListener('mousedown',function(e){
-    if(e.target.closest('.bar')||e.target.closest('.note-card')||e.target.closest('input')||e.target.closest('textarea')||e.target.closest('select')||e.target.closest('button')) return;
-    isDown=true; target=wrap; startX=e.pageX-wrap.offsetLeft; scrollLeft=wrap.scrollLeft; wrap.style.cursor='grabbing';
+  if(window.IS_READONLY) return;
+  var wrap=document.querySelector('.gantt-wrap'); if(!wrap) return;
+  var isDown=false,startX=0,scrollLeft=0;
+  wrap.addEventListener('mousedown',e=>{
+    if(e.target.closest('.bar')||e.target.closest('input')||e.target.closest('button')) return;
+    isDown=true; startX=e.pageX-wrap.offsetLeft; scrollLeft=wrap.scrollLeft; wrap.style.cursor='grabbing';
   });
-  window.addEventListener('mouseup',function(){isDown=false; if(wrap) wrap.style.cursor='auto';});
-  wrap.addEventListener('mouseleave',function(){isDown=false; wrap.style.cursor='auto';});
-  wrap.addEventListener('mousemove',function(e){
-    if(!isDown) return; e.preventDefault(); var x=e.pageX-wrap.offsetLeft; var walk=(x-startX)*1.2; wrap.scrollLeft=scrollLeft-walk;
-  });
+  window.addEventListener('mouseup',()=>{isDown=false; wrap.style.cursor='grab';});
+  wrap.addEventListener('mousemove',e=>{ if(!isDown) return; e.preventDefault(); wrap.scrollLeft=scrollLeft-(e.pageX-wrap.offsetLeft-startX); });
 }
 
-
-
-// ── Drag/resize bars ──
+// === BAR DRAG ===
 var BAR_DRAG=null;
-function showDragTip(x,y,text){var t=document.getElementById('dragTooltip'); if(!t) return; t.style.display='block'; t.style.left=(x+14)+'px'; t.style.top=(y-10)+'px'; t.innerHTML=text;}
-function hideDragTip(){var t=document.getElementById('dragTooltip'); if(t) t.style.display='none';}
+function showDragTip(x,y,txt){ var t=document.getElementById('dragTooltip'); t.style.display='block'; t.style.left=(x+14)+'px'; t.style.top=(y-10)+'px'; t.innerHTML=txt; }
+function hideDragTip(){ document.getElementById('dragTooltip').style.display='none'; }
 function startBarDrag(bar,e){
-  var timeline=bar.parentElement;
-  var rect=timeline.getBoundingClientRect();
-  var dayMs=86400000;
-  var start=new Date(bar.dataset.start||'');
-  var end=new Date(bar.dataset.end||'');
-  if(!bar.dataset.start||!bar.dataset.end||String(start)==='Invalid Date'||String(end)==='Invalid Date') return;
+  if(window.IS_READONLY) return;
+  var rect=bar.parentElement.getBoundingClientRect();
+  var start=new Date(bar.dataset.start), end=new Date(bar.dataset.end);
+  if(!bar.dataset.start||!bar.dataset.end||isNaN(start)||isNaN(end)) return;
   var mode='move';
   if(e.target.classList.contains('handle-left')) mode='resize-left';
   else if(e.target.classList.contains('handle-right')) mode='resize-right';
-  BAR_DRAG={bar:bar,tid:bar.dataset.tid,rect:rect,startX:e.clientX,startY:e.clientY,origStart:start,origEnd:end,mode:mode,moved:false};
+  BAR_DRAG={bar,tid:bar.dataset.tid,rect,startX:e.clientX,origStart:start,origEnd:end,mode,moved:false};
   document.addEventListener('mousemove',onBarDrag);
   document.addEventListener('mouseup',endBarDrag);
 }
 function onBarDrag(e){
   if(!BAR_DRAG) return;
-  var dayMs=86400000;
   var dx=e.clientX-BAR_DRAG.startX;
-  if(Math.abs(dx) < 4 && !BAR_DRAG.moved) return;
+  if(Math.abs(dx)<4 && !BAR_DRAG.moved) return;
   BAR_DRAG.moved=true;
-  var pctDelta=dx/BAR_DRAG.rect.width;
-  var daysDelta=Math.round(pctDelta*TD);
-  var ns=new Date(BAR_DRAG.origStart.getTime());
-  var ne=new Date(BAR_DRAG.origEnd.getTime());
-  if(BAR_DRAG.mode==='move'){
-    ns=new Date(BAR_DRAG.origStart.getTime()+daysDelta*dayMs);
-    ne=new Date(BAR_DRAG.origEnd.getTime()+daysDelta*dayMs);
-  } else if(BAR_DRAG.mode==='resize-left'){
-    ns=new Date(BAR_DRAG.origStart.getTime()+daysDelta*dayMs);
-    if(ns>=ne) ns=new Date(ne.getTime()-dayMs);
-  } else {
-    ne=new Date(BAR_DRAG.origEnd.getTime()+daysDelta*dayMs);
-    if(ne<=ns) ne=new Date(ns.getTime()+dayMs);
-  }
+  var daysDelta=Math.round((dx/BAR_DRAG.rect.width)*TD);
+  var ns=new Date(BAR_DRAG.origStart), ne=new Date(BAR_DRAG.origEnd);
+  if(BAR_DRAG.mode==='move'){ ns=new Date(BAR_DRAG.origStart.getTime()+daysDelta*86400000); ne=new Date(BAR_DRAG.origEnd.getTime()+daysDelta*86400000); }
+  else if(BAR_DRAG.mode==='resize-left'){ ns=new Date(BAR_DRAG.origStart.getTime()+daysDelta*86400000); if(ns>=ne) ns=new Date(ne.getTime()-86400000); }
+  else{ ne=new Date(BAR_DRAG.origEnd.getTime()+daysDelta*86400000); if(ne<=ns) ne=new Date(ns.getTime()+86400000); }
   BAR_DRAG.bar.style.left='calc('+lft(ns.toISOString().slice(0,10))+' + 2px)';
   BAR_DRAG.bar.style.width='calc('+wid(ns.toISOString().slice(0,10),ne.toISOString().slice(0,10))+' - 4px)';
   BAR_DRAG.bar.dataset.start=ns.toISOString().slice(0,10);
   BAR_DRAG.bar.dataset.end=ne.toISOString().slice(0,10);
-  var bd=BAR_DRAG.bar.querySelector('.bar-date'); if(bd) bd.textContent=fmt(ns.toISOString().slice(0,10))+' → '+fmt(ne.toISOString().slice(0,10));
+  var dateStr = fmt(ns.toISOString().slice(0,10))+' → '+fmt(ne.toISOString().slice(0,10));
+  var bd=BAR_DRAG.bar.querySelector('.bar-date');
+  if(bd) bd.textContent=dateStr;
+  // Also update external date element if it exists
+  var extDate = BAR_DRAG.bar.parentElement.querySelector('.bar-date-external');
+  if(extDate){
+    extDate.textContent = dateStr;
+    extDate.style.left = 'calc('+lft(ns.toISOString().slice(0,10))+' - 110px)';
+  }
   showDragTip(e.clientX,e.clientY,'<strong>'+fmt(ns.toISOString().slice(0,10))+'</strong> → <strong>'+fmt(ne.toISOString().slice(0,10))+'</strong>');
 }
 function endBarDrag(e){
@@ -905,28 +809,37 @@ function endBarDrag(e){
   document.removeEventListener('mousemove',onBarDrag);
   document.removeEventListener('mouseup',endBarDrag);
   hideDragTip();
-  if(!moved){
-    BAR_DRAG=null;
-    if(tid) openEditor(tid);
-    return;
-  }
-  if(CURRENT_UNIT && tid && DATA.units[CURRENT_UNIT] && DATA.units[CURRENT_UNIT].tasks && DATA.units[CURRENT_UNIT].tasks[tid]){
+  if(!moved){ BAR_DRAG=null; if(tid) openEditor(tid); return; }
+  if(CURRENT_UNIT && tid && DATA.units[CURRENT_UNIT].tasks && DATA.units[CURRENT_UNIT].tasks[tid]){
     DATA.units[CURRENT_UNIT].tasks[tid].s=bar.dataset.start;
     DATA.units[CURRENT_UNIT].tasks[tid].e=bar.dataset.end;
     autoSave();
-    saveData();
-    toast('Timeline updated');
+    renderUnit(CURRENT_UNIT); // Re-render to recalculate date positions
+    toast('Updated');
   }
   BAR_DRAG=null;
 }
 function enableBarDrag(){
-  if(window.IS_READONLY) return; // No drag editing for client mode
-  document.querySelectorAll('.bar').forEach(function(bar){
-    bar.style.cursor='grab';
-    bar.onmousedown=function(e){ e.stopPropagation(); e.preventDefault(); startBarDrag(bar,e); };
-  });
+  if(window.IS_READONLY) return;
+  document.querySelectorAll('.bar').forEach(bar=>{ bar.style.cursor='grab'; bar.onmousedown=e=>{e.stopPropagation();e.preventDefault();startBarDrag(bar,e);}; });
 }
-// ── Start ──
+
+// === LANG ===
+function toggleLang(){
+  LANG = LANG==='en'?'el':'en';
+  document.getElementById('langBtn').textContent = LANG==='en'?'GR Ελληνικά':'EN English';
+  document.getElementById('hTitle').textContent = LANG==='el'?'Οικισμός Γαλατσίου — Χρονοδιάγραμμα Κατασκευής':'Galatsi Residence — Construction Timeline';
+  document.getElementById('hSub').textContent = LANG==='el'?'Ιπείρου 22, Γαλάτσι · LEED Platinum · Ζωντανή παρακολούθηση':'Ipeirou 22, Galatsi · LEED Platinum · Live progress tracker';
+  if(CURRENT_UNIT) renderUnit(CURRENT_UNIT);
+}
+
+// === KEYBOARD ===
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ closeEditor(); closeNoteEditor(); }
+  if(e.key==='s' && (e.metaKey||e.ctrlKey)){ e.preventDefault(); saveData(); }
+});
+
+// === START ===
 init();
 </script>
 </body>
