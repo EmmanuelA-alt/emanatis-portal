@@ -24,7 +24,7 @@ select:focus{outline:1px solid #5ba3f5}
 .lang-btn{background:#1e1e2e;border:1px solid #3a3a5a;color:#aaa;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s}
 .lang-btn:hover{background:#2a2a4a;color:#fff}
 .container{padding:24px 32px;max-width:1600px;margin:0 auto}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px}
 .stat{background:#16161d;border:1px solid #2a2a3a;border-radius:10px;padding:14px 18px}
 .stat .slabel{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px}
 .stat .svalue{font-size:22px;font-weight:700;color:#fff;margin-top:4px}
@@ -138,10 +138,15 @@ body.readonly-mode .btn{display:none!important}
 body.readonly-mode .lang-btn{display:block!important}
 body.readonly-mode select{display:none!important}
 /* Responsive */
+@media(max-width:900px){
+  .client-info>div:first-child{grid-template-columns:1fr 1fr}
+  .client-info input{font-size:13px}
+}
 @media(max-width:768px){
   header{padding:16px}
   .container{padding:16px}
   .stats{grid-template-columns:repeat(2,1fr)}
+  .client-info>div:first-child{grid-template-columns:1fr}
   .task-label{min-width:220px;width:220px}
   .gh-label{min-width:220px;width:220px}
   .procurement-items{grid-template-columns:1fr}
@@ -261,6 +266,8 @@ var EDITING_NOTE = null;
 var DATA_URL = 'galatsi-residence-units.json';
 var DATA_KEY = 'galatsi-residence-data';
 var LANG = 'en';
+var GH_REPO = 'EmmanuelA-alt/emanatis-portal';
+var GH_DATA_PATH = 'galatsi-residence-units.json';
 
 // === CONFIG ===
 var TS = new Date('2026-01-01');
@@ -483,11 +490,31 @@ function renderUnit(uid){
   var html = '<div class="container">';
 
   // Stats
+  var hdStat = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'TBD');
+  var hdYr = unit.handoverDate ? '2026' : '';
   html += '<div class="stats">';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Κατάσταση':'Status')+'</div><div class="svalue" style="color:#f0a830">'+(LANG==='el'?'Σε Εξέλιξη':'In Progress')+'</div><div class="ssub">'+(LANG==='el'?'Πολλά συνεργεία ενεργά':'Multiple trades active')+'</div></div>';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Μονάδα':'Unit')+'</div><div class="svalue">'+esc(unit.name)+'</div><div class="ssub">Floor '+unit.floor+' · '+(unit.size_m2||108)+' m²</div></div>';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Πιστοποίηση':'Certification')+'</div><div class="svalue" style="color:#4dba78">LEED</div><div class="ssub">'+(LANG==='el'?'Στόχος Platinum':'Platinum target')+'</div></div>';
-  html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Παράδοση':'Handover')+'</div><div class="svalue">'+(LANG==='el'?'Αρχές Μαΐου':'Early May')+'</div><div class="ssub">2026</div></div>';
+  html += '<div class="stat" id="hdStatBlock" style="cursor:pointer" onclick="document.getElementById(\'handoverEdit\').style.display=\'flex\';this.style.display=\'none\'"><div class="slabel">'+(LANG==='el'?'Παράδοση':'Handover')+'</div><div class="svalue" id="hdStatValue">'+esc(hdStat)+'</div><div class="ssub" id="hdYrValue">'+hdYr+'</div></div>';
+  html += '<div class="stat" id="handoverEdit" style="display:none;flex-direction:column;gap:6px"><div class="slabel">'+(LANG==='el'?'Παράδοση':'Handover')+'</div><input type="date" value="'+(unit.handoverDate||'')+'" onchange="var d=this.value;DATA.units[CURRENT_UNIT].handoverDate=d||null;DATA.units[CURRENT_UNIT].handover=d?fmt(d)+\' 2026\':\'TBD\';autoSave();var vd=document.getElementById(\'hdStatValue\'),vy=document.getElementById(\'hdYrValue\'),hb=document.getElementById(\'hdStatBlock\');if(vd)vd.textContent=d?fmt(d)+\' 2026\':\'TBD\';if(vy)vy.textContent=d?\'2026\':\'\';if(hb)hb.style.display=\'\';this.parentElement.style.display=\'none\'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 10px;border-radius:8px;font-size:14px"></div>';
+  html += '</div>';
+
+  // Client Info Section
+  html += '<div class="client-info" style="background:#16161d;border:1px solid #2a2a3a;border-radius:12px;padding:18px 24px;margin-bottom:20px">';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">';
+  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Όνομα Πελάτη':'Client Name')+'</div><input value="'+esc(unit.client||'')+'" onchange="DATA.units[CURRENT_UNIT].client=this.value;autoSave()" placeholder="'+(LANG==='el'?'Όνομα πελάτη':'Client name')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Email':'Email')+'</div><input value="'+esc(unit.email||'')+'" onchange="DATA.units[CURRENT_UNIT].email=this.value;autoSave()" placeholder="'+(LANG==='el'?'Email':'email')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Τηλέφωνο':'Phone')+'</div><input value="'+esc(unit.phone||'')+'" onchange="DATA.units[CURRENT_UNIT].phone=this.value;autoSave()" placeholder="'+(LANG==='el'?'Τηλέφωνο':'phone')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '</div>';
+  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Σημειώσεις':'Notes')+'</div><input value="'+esc(unit.clientNotes||'')+'" onchange="DATA.units[CURRENT_UNIT].clientNotes=this.value;autoSave()" placeholder="'+(LANG==='el'?'Σημειώσεις':'notes')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '</div>';
+
+  // Save Button
+  html += '<div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">';
+  html += '<button class="btn btn-save" onclick="saveData()" style="font-size:14px;padding:10px 24px">💾 '+(LANG==='el'?'Αποθήκευση':'Save')+'</button>';
+  html += '<button class="btn btn-primary" onclick="exportJSON()" style="font-size:14px;padding:10px 24px">⬇ '+(LANG==='el'?'Λήψη JSON':'Export JSON')+'</button>';
+  html += '<span id="autoSaveStatus" style="font-size:12px;color:#666"></span>';
   html += '</div>';
 
   // Legend
@@ -582,10 +609,13 @@ function renderUnit(uid){
   });
   html += '</div></div>';
 
-  // Handover
+  // Handover — editable
+  var hd = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'TBD');
   html += '<div class="handover-panel"><div><h3>'+(LANG==='el'?'Παράδοση Κλειδιών':'Key Handover')+' — '+esc(unit.name)+'</h3><p>'+(LANG==='el'?'Επαγγελματικός καθαρισμός · Έξυπνο σπίτι · Πλήρης έλεγχος':'Professional cleaning · Smart home configured · All systems commissioned')+'</p></div>';
-  var hd = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'Early May 2026');
-  html += '<div class="hdate">'+esc(hd)+'</div></div>';
+  html += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">';
+  html += '<div class="hdate" id="handoverDisplay" style="cursor:pointer;border-bottom:1px dashed #4dba78;font-size:22px;font-weight:700;color:#fff" title="Click to edit" onclick="editHandover()">'+esc(hd)+'</div>';
+  html += '<input type="date" id="handoverDateInput" value="'+(unit.handoverDate||'')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 10px;border-radius:6px;font-size:13px;display:none" onchange="saveHandover(this.value)">';
+  html += '</div></div>';
 
   // Notes
   var notes = unit.notes || {};
@@ -688,10 +718,14 @@ function deleteNote(){
 }
 
 // === SAVE/LOAD ===
-function autoSave(){ try{ localStorage.setItem(DATA_KEY, JSON.stringify(DATA)); }catch(e){} }
+function autoSave(){
+  try {
+    localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
+    var el = document.getElementById('autoSaveStatus');
+    if(el){ el.textContent = '✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' saved'; setTimeout(function(){ if(el) el.textContent=''; }, 3000); }
+  } catch(e){}
+}
 function saveData(){
-  var GH_REPO = 'EmmanuelA-alt/emanatis-portal';
-  var GH_DATA_PATH = 'galatsi-residence-units.json';
   var token = localStorage.getItem('gh_save_token');
   if(!token){
     token = prompt('Enter your GitHub Personal Access Token (with repo scope).\nThis will be stored in your browser only.\nGet one at: github.com/settings/tokens');
@@ -700,11 +734,12 @@ function saveData(){
   }
   var api = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_PATH;
   var content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
+  // Get current file SHA for update
   fetch(api, {headers: {'Authorization': 'token ' + token}})
     .then(function(r){ return r.json(); })
     .then(function(existing){
       var body = {
-        message: 'auto: save timeline — ' + new Date().toISOString().slice(0,16),
+        message: 'auto: save data from app — ' + new Date().toISOString().slice(0,16),
         content: content,
         sha: existing.sha
       };
@@ -722,16 +757,19 @@ function saveData(){
       localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
       toast('✓ Saved to GitHub');
     })
-    .catch(function(err){
-      toast('GitHub save failed: ' + err.message, true);
-      localStorage.removeItem('gh_save_token');
+    .catch(function(e){
+      toast('✗ Save failed: ' + e.message, true);
+      // Clear bad token so user is prompted again
+      if(e.message && (e.message.indexOf('Bad credentials') > -1 || e.message.indexOf('401') > -1)){
+        localStorage.removeItem('gh_save_token');
+      }
     });
 }
 function exportJSON(){
   var blob = new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'luminara-units.json';
+  a.download = 'galatsi-residence-units.json';
   a.click();
 }
 function importJSON(e){
@@ -892,6 +930,26 @@ document.addEventListener('keydown',e=>{
 });
 
 // === START ===
+function editHandover(){
+  var disp = document.getElementById('handoverDisplay');
+  var inp = document.getElementById('handoverDateInput');
+  if(!disp || !inp) return;
+  inp.style.display = 'block';
+  inp.style.width = '160px';
+  disp.style.display = 'none';
+  inp.focus();
+}
+function saveHandover(val){
+  var disp = document.getElementById('handoverDisplay');
+  var inp = document.getElementById('handoverDateInput');
+  if(!disp || !inp) return;
+  DATA.units[CURRENT_UNIT].handoverDate = val || null;
+  DATA.units[CURRENT_UNIT].handover = val ? fmt(val)+' 2026' : 'TBD';
+  disp.textContent = val ? fmt(val)+' 2026' : 'TBD';
+  disp.style.display = 'block';
+  inp.style.display = 'none';
+  autoSave();
+}
 init();
 </script>
 </body>
