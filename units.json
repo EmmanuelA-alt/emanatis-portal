@@ -3195,7 +3195,7 @@
           "st": "pending",
           "s": "2026-07-20",
           "e": "2026-08-13",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased"
         },
         "t6": {
           "st": "blocked",
@@ -3213,49 +3213,49 @@
           "st": "pending",
           "s": "2026-07-23",
           "e": "2026-08-01",
-          "nt": "4 days - after flooring complete"
+          "nt": "After flooring complete"
         },
         "t9": {
           "st": "critical",
           "s": "2026-06-06",
           "e": "2026-06-22",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": ""
         },
         "t14": {
           "st": "pending",
           "s": "2026-06-30",
           "e": "2026-07-11",
-          "nt": "4 days - after windows installed"
+          "nt": ""
         },
         "t4": {
           "st": "pending",
           "s": "2026-06-30",
           "e": "2026-07-09",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered"
         },
         "t5": {
           "st": "pending",
           "s": "2026-06-30",
           "e": "2026-07-14",
-          "nt": "Ordered - 2 days install"
+          "nt": "Ordered"
         },
         "t3": {
           "st": "pending",
           "s": "2026-06-30",
           "e": "2026-07-25",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco"
         },
         "t13": {
           "st": "pending",
           "s": "2026-08-09",
           "e": "2026-08-20",
-          "nt": "5 days installation"
+          "nt": ""
         },
         "t18": {
           "st": "inprogress",
           "s": "2026-02-22",
           "e": "2026-06-01",
-          "nt": "EV station for Fatouros included"
+          "nt": ""
         },
         "t17": {
           "st": "pending",
@@ -3297,7 +3297,7 @@
           "st": "pending",
           "s": "2026-08-16",
           "e": "2026-10-30",
-          "nt": "Phased May-July"
+          "nt": ""
         }
       },
       "translations": {
