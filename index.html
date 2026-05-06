@@ -736,8 +736,8 @@ function saveData(){
     if(!token || !token.trim()) return;
     localStorage.setItem('gh_pat_token', token.trim());
   }
-  var repo = GH_REPO;
-  var path = GH_DATA_PATH;
+  var repo = 'EmmanuelA-alt/emanatis-orpheus-workspace';
+  var path = 'docs/galatsi-residence-units.json';
   var apiBase = 'https://api.github.com/repos/' + repo + '/contents/' + path;
   var content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
 
