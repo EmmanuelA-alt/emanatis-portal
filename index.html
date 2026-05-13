@@ -138,6 +138,18 @@ body.readonly-mode .btn{display:none!important}
 body.readonly-mode .btn-nav,body.readonly-mode .btn-today{display:inline-block!important}
 body.readonly-mode .lang-btn{display:block!important}
 body.readonly-mode select{display:none!important}
+/* Client mode — full lockdown */
+body.client-mode .bar{cursor:default!important}
+body.client-mode .note-card{cursor:default!important}
+body.client-mode .note-add{display:none!important}
+body.client-mode .notes-custom{display:none!important}
+body.client-mode .btn{display:none!important}
+body.client-mode .btn-nav,body.client-mode .btn-today{display:inline-block!important}
+body.client-mode .lang-btn{display:block!important}
+body.client-mode select{display:none!important}
+body.client-mode .client-info input{background:transparent!important;border:none!important;padding:0!important;color:#ccc!important}
+body.client-mode .client-info input:focus{outline:none!important}
+body.client-mode .notes-section h3 button{display:none!important}
 /* Responsive */
 @media(max-width:900px){
   .client-info>div:first-child{grid-template-columns:1fr 1fr}
@@ -419,45 +431,93 @@ var PROCUREMENT_EL = [
 ];
 
 // === INIT ===
+var CLIENT_TOKEN = null;
+var CLIENT_UNIT = null;
+
 function init(){
   var params = new URLSearchParams(window.location.search);
+  var hash = window.location.hash;
   
-  // Check for unit-specific read-only modes
-  var unitModes = {
-    'gaia': '1a',
-    'harmonia': '1b',
-    'aurora': '2a',
-    'serenity': '2b',
-    'celestia': '3a',
-    'solarus': '3b',
-    'radiance': '4a',
-    'elysium': '4b',
-    'luminara': '5a',
-    'aetheria': 'p'
-  };
-  
+  // === TOKEN-BASED CLIENT ACCESS ===
+  // Primary: ?t=<TOKEN> — secure, unguessable, permanent client link
+  // Legacy: ?luminara=1 etc. — still works for backwards compat but redirects
   var targetUnit = null;
-  for(var mode in unitModes){
-    if(params.get(mode) === '1'){
-      targetUnit = unitModes[mode];
-      break;
-    }
-  }
-  if(!targetUnit && params.get('unit')){
-    targetUnit = params.get('unit');
-  }
+  var isClientMode = false;
   
-  window.IS_READONLY = !!targetUnit;
-
+  // Check for token-based access
+  var tokenParam = params.get('t');
+  
+  // First load the data, then resolve token
   fetch(DATA_URL).then(r=>r.json()).then(data=>{
     DATA = data;
+    
+    // Resolve token to unit
+    if(tokenParam){
+      for(var uid in DATA.units){
+        if(DATA.units[uid].token === tokenParam){
+          targetUnit = uid;
+          isClientMode = true;
+          CLIENT_TOKEN = tokenParam;
+          CLIENT_UNIT = uid;
+          break;
+        }
+      }
+      if(!targetUnit){
+        // Invalid token — show clean error, no data leak
+        document.getElementById('app').innerHTML = '<div class="container" style="text-align:center;padding:80px 32px"><h2 style="color:#f05070">Invalid Link</h2><p style="color:#888;margin-top:12px">This link is not valid or has expired. Please contact Emanatis Group for an updated link.</p><p style="color:#555;margin-top:8px;font-size:13px">orpheus@emanatis.com</p></div>';
+        return;
+      }
+      // Clean URL — replace query params with clean path, preserve token
+      if(window.history && window.history.replaceState){
+        window.history.replaceState({}, '', '?t=' + tokenParam);
+      }
+    } else {
+      // Legacy support: redirect old ?luminara=1 style to token-based
+      var legacyMap = {'gaia':'1a','harmonia':'1b','aurora':'2a','serenity':'2b','celestia':'3a','solarus':'3b','radiance':'4a','elysium':'4b','luminara':'5a','aetheria':'p'};
+      for(var key in legacyMap){
+        if(params.get(key) === '1'){
+          var legacyUnit = legacyMap[key];
+          if(DATA.units[legacyUnit] && DATA.units[legacyUnit].token){
+            // Redirect to new token URL
+            window.location.replace('?t=' + DATA.units[legacyUnit].token);
+            return;
+          }
+        }
+      }
+      // Also support ?unit=<id> for admin
+      if(params.get('unit')){
+        targetUnit = params.get('unit');
+      }
+    }
+    
     localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
-    if(targetUnit){
+    window.IS_READONLY = isClientMode;
+    
+    if(targetUnit && isClientMode){
+      // CLIENT VIEW — locked down, single unit, zero admin controls
       CURRENT_UNIT = targetUnit;
-      document.body.classList.add('readonly-mode');
+      document.body.classList.add('client-mode');
       var unit = DATA.units[targetUnit];
-      document.querySelector('h1').textContent = 'Galatsi Residence — ' + unit.name + ' Timeline';
-      document.getElementById('hSub').textContent = 'Private Client Portal · Floor ' + unit.floor + ' · ' + (unit.size_m2||'') + ' m²';
+      
+      // Strip down the header for clients
+      document.querySelector('h1').textContent = unit.name + ' — Construction Timeline';
+      document.getElementById('hSub').textContent = 'Galatsi Residence · Floor ' + unit.floor + ' · ' + (unit.size_m2||'') + ' m² · LEED Platinum';
+      
+      // Hide all admin controls
+      var headerRight = document.querySelector('.header-right');
+      if(headerRight){
+        // Keep only LIVE indicator and language button
+        headerRight.innerHTML = '<div class="live-indicator"><div class="live-dot"></div><span class="live-text">LIVE</span></div><button class="lang-btn" id="langBtn" onclick="toggleLang()">GR Ελληνικά</button>';
+      }
+      
+      renderUnit(targetUnit);
+      // Strip client-mode post-render cleanup
+      cleanupClientView();
+    } else if(targetUnit){
+      // Admin viewing specific unit (via ?unit=)
+      CURRENT_UNIT = targetUnit;
+      populateSelect();
+      document.getElementById('unitSelect').value = targetUnit;
       renderUnit(targetUnit);
     } else {
       populateSelect();
@@ -467,6 +527,58 @@ function init(){
     var saved = localStorage.getItem(DATA_KEY);
     if(saved){ DATA = JSON.parse(saved); populateSelect(); toast('Loaded from cache'); }
   });
+}
+
+function cleanupClientView(){
+  // Remove all editing capabilities from client view
+  // Remove save buttons, export/import, client info inputs, handover edit
+  setTimeout(function(){
+    // Remove admin buttons and inputs
+    var adminElements = document.querySelectorAll('.btn-save, .btn-primary, .client-info input, #handoverEdit, .note-add, .notes-custom');
+    adminElements.forEach(function(el){ el.remove(); });
+    
+    // Make all inputs readonly
+    document.querySelectorAll('input').forEach(function(el){ el.readOnly = true; });
+    
+    // Remove save bar if present
+    var saveBar = document.querySelector('.container > div[style*="display:flex;gap:12px"]');
+    if(saveBar) saveBar.remove();
+    
+    // Remove client info editing capability
+    var clientInfo = document.querySelector('.client-info');
+    if(clientInfo){
+      clientInfo.querySelectorAll('input').forEach(function(inp){
+        var val = inp.value || '';
+        var display = document.createElement('div');
+        display.style.cssText = 'font-size:14px;color:#ccc;padding:8px 0';
+        display.textContent = val || '—';
+        inp.replaceWith(display);
+      });
+    }
+    
+    // Make handover display non-clickable
+    var hd = document.getElementById('handoverDisplay');
+    if(hd){ hd.style.cursor = 'default'; hd.style.borderBottom = 'none'; hd.onclick = null; }
+    
+    // Remove note editing
+    document.querySelectorAll('.note-card').forEach(function(card){ card.onclick = null; card.style.cursor = 'default'; });
+    
+    // Remove add note button
+    var addNote = document.querySelector('.note-add');
+    if(addNote) addNote.remove();
+    
+    // Remove custom notes textarea
+    var customNotes = document.querySelector('.notes-custom');
+    if(customNotes) customNotes.remove();
+    
+    // Remove the add note button in section header
+    var addBtn = document.querySelector('.notes-section h3 button');
+    if(addBtn) addBtn.remove();
+    
+    // Remove handover click-to-edit on stat block
+    var hdStatBlock = document.getElementById('hdStatBlock');
+    if(hdStatBlock){ hdStatBlock.onclick = null; hdStatBlock.style.cursor = 'default'; }
+  }, 200);
 }
 
 function populateSelect(){
@@ -736,8 +848,8 @@ function saveData(){
     if(!token || !token.trim()) return;
     localStorage.setItem('gh_pat_token', token.trim());
   }
-  var repo = 'EmmanuelA-alt/emanatis-orpheus-workspace';
-  var path = 'docs/galatsi-residence-units.json';
+  var repo = GH_REPO;
+  var path = GH_DATA_PATH;
   var apiBase = 'https://api.github.com/repos/' + repo + '/contents/' + path;
   var content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2))));
 
