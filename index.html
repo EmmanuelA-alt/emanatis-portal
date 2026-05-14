@@ -78,9 +78,9 @@ select:focus{outline:1px solid #5ba3f5}
 .bar.blocked{background:linear-gradient(90deg,#3a2010,#5a3010);border:1px solid #8a5020;color:#f08030}
 .bar.ordered{background:linear-gradient(90deg,#0d3320,#14512e);border:1px solid #1d7a44;color:#3ddc6e}
 /* Bar menu button */
-.bar-menu-btn{position:absolute;right:-6px;top:-8px;width:20px;height:20px;border-radius:4px;background:#2a2a4a;border:1px solid #4a4a6a;color:#aaa;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;opacity:0;transition:opacity 0.15s;padding:0;line-height:1}
-.bar:hover .bar-menu-btn,.bar-menu-btn:focus{opacity:1}
-.bar-menu-btn:hover{background:#3a3a5a;color:#fff}
+.bar-menu-btn{position:absolute;right:-6px;top:-8px;width:20px;height:20px;border-radius:4px;background:#2a2a4a;border:1px solid #4a4a6a;color:#aaa;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;opacity:0.6;transition:opacity 0.15s;padding:0;line-height:1}
+.bar:hover .bar-menu-btn{opacity:1}
+.bar-menu-btn:hover{background:#3a3a5a;color:#fff;opacity:1}
 /* Segment gap style */
 .bar-segment{border-radius:6px;position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;min-width:4px}
 .bar-segment-gap{position:absolute;top:50%;transform:translateY(-50%);height:2px;border-top:2px dashed rgba(255,255,255,0.15);z-index:0}
@@ -749,7 +749,7 @@ function renderUnit(uid){
           if(!showSegDatesInside){
             html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(segS)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+segDateStr+'</div>';
           }
-          html += '<div class="bar-segment bar '+st+'" data-tid="'+t.id+'" data-seg="'+si+'" data-start="'+segS+'" data-end="'+segE+'" style="left:calc('+lft(segS)+' + 2px);width:calc('+wid(segS,segE)+' - 4px)"><div class="handle handle-left"></div>'+(showSegDatesInside?'<span class="bar-date">'+segDateStr+'</span>':'')+'<div class="handle handle-right"></div><button class="bar-menu-btn" onclick="event.stopPropagation();event.preventDefault();showCtxMenu(event,'+JSON.stringify(t.id)+','+si+')">⋮</button></div>';
+          html += '<div class="bar-segment bar '+st+'" data-tid="'+t.id+'" data-seg="'+si+'" data-start="'+segS+'" data-end="'+segE+'" style="left:calc('+lft(segS)+' + 2px);width:calc('+wid(segS,segE)+' - 4px)"><div class="handle handle-left"></div>'+(showSegDatesInside?'<span class="bar-date">'+segDateStr+'</span>':'')+'<div class="handle handle-right"></div><button class="bar-menu-btn" onclick="showCtxMenu(event,'+JSON.stringify(t.id)+','+si+')">⋮</button></div>';
           // Draw dashed gap between segments (except after last)
           if(si < segs.length - 1){
             var gapS = segE, gapE = segs[si+1].s;
@@ -767,9 +767,9 @@ function renderUnit(uid){
         
         if(!showDatesInside){
           html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(s)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+dateStr+'</div>';
-          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="event.stopPropagation();event.preventDefault();showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
+          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
         } else {
-          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="event.stopPropagation();event.preventDefault();showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
+          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
         }
       }
     } else {
@@ -1126,6 +1126,8 @@ var CTX_TASK = null;
 var CTX_SEG = -1;
 function showCtxMenu(e, tid, segIdx){
   if(window.IS_READONLY) return;
+  e.stopPropagation();
+  e.preventDefault();
   CTX_TASK = tid;
   CTX_SEG = segIdx;
   var menu = document.getElementById('ctxMenu');
