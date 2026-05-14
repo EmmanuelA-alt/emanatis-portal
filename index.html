@@ -749,7 +749,7 @@ function renderUnit(uid){
           if(!showSegDatesInside){
             html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(segS)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+segDateStr+'</div>';
           }
-          html += '<div class="bar-segment bar '+st+'" data-tid="'+t.id+'" data-seg="'+si+'" data-start="'+segS+'" data-end="'+segE+'" style="left:calc('+lft(segS)+' + 2px);width:calc('+wid(segS,segE)+' - 4px)"><div class="handle handle-left"></div>'+(showSegDatesInside?'<span class="bar-date">'+segDateStr+'</span>':'')+'<div class="handle handle-right"></div><button class="bar-menu-btn" onclick="showCtxMenu(event,'+JSON.stringify(t.id)+','+si+')">⋮</button></div>';
+          html += '<div class="bar-segment bar '+st+'" data-tid="'+t.id+'" data-seg="'+si+'" data-start="'+segS+'" data-end="'+segE+'" style="left:calc('+lft(segS)+' + 2px);width:calc('+wid(segS,segE)+' - 4px)"><div class="handle handle-left"></div>'+(showSegDatesInside?'<span class="bar-date">'+segDateStr+'</span>':'')+'<div class="handle handle-right"></div><button class="bar-menu-btn" data-tid="'+t.id+'" data-seg="'+si+'">⋮</button></div>';
           // Draw dashed gap between segments (except after last)
           if(si < segs.length - 1){
             var gapS = segE, gapE = segs[si+1].s;
@@ -767,9 +767,9 @@ function renderUnit(uid){
         
         if(!showDatesInside){
           html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(s)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+dateStr+'</div>';
-          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
+          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div><button class="bar-menu-btn" data-tid="'+t.id+'" data-seg="-1">⋮</button></div>';
         } else {
-          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
+          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div><button class="bar-menu-btn" data-tid="'+t.id+'" data-seg="-1">⋮</button></div>';
         }
       }
     } else {
@@ -815,6 +815,7 @@ function renderUnit(uid){
   setTimeout(scrollToToday, 100);
   enableDragScroll();
   enableBarDrag();
+  enableBarMenus();
 }
 
 // === EDITORS ===
@@ -1105,6 +1106,18 @@ function enableBarDrag(){
   if(window.IS_READONLY) return;
   document.querySelectorAll('.bar, .bar-segment').forEach(bar=>{ bar.style.cursor='grab'; bar.onmousedown=e=>{e.stopPropagation();e.preventDefault();startBarDrag(bar,e);}; });
 }
+function enableBarMenus(){
+  if(window.IS_READONLY) return;
+  document.querySelectorAll('.bar-menu-btn').forEach(function(btn){
+    btn.onclick = function(e){
+      e.stopPropagation();
+      e.preventDefault();
+      var tid = this.getAttribute('data-tid');
+      var seg = parseInt(this.getAttribute('data-seg') || '-1');
+      showCtxMenu(e, tid, seg);
+    };
+  });
+}
 
 // === LANG ===
 function toggleLang(){
@@ -1126,8 +1139,8 @@ var CTX_TASK = null;
 var CTX_SEG = -1;
 function showCtxMenu(e, tid, segIdx){
   if(window.IS_READONLY) return;
-  e.stopPropagation();
-  e.preventDefault();
+  var ev = e || window.event;
+  if(ev){ ev.stopPropagation(); ev.preventDefault(); }
   CTX_TASK = tid;
   CTX_SEG = segIdx;
   var menu = document.getElementById('ctxMenu');
@@ -1139,8 +1152,10 @@ function showCtxMenu(e, tid, segIdx){
   } else {
     mergeItem.style.display = 'none';
   }
-  menu.style.left = e.clientX + 'px';
-  menu.style.top = (e.clientY - 10) + 'px';
+  var cx = ev ? ev.clientX : 200;
+  var cy = ev ? ev.clientY : 200;
+  menu.style.left = cx + 'px';
+  menu.style.top = cy + 'px';
   menu.classList.add('active');
   // Adjust if off-screen right
   requestAnimationFrame(function(){
