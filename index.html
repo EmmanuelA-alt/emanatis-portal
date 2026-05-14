@@ -297,11 +297,21 @@ body.client-mode .notes-section h3 button{display:none!important}
 
 <!-- Bar context menu -->
 <div class="ctx-menu" id="ctxMenu">
-  <div class="ctx-menu-item" onclick="ctxSplit()">✂️ Split at point…</div>
-  <div class="ctx-menu-item" onclick="ctxMerge()">🔗 Merge segments</div>
-  <div class="ctx-menu-sep"></div>
-  <div class="ctx-menu-item" onclick="ctxEdit()">✏️ Edit task</div>
-  <div class="ctx-menu-item danger" onclick="ctxClear()">🗑️ Clear dates</div>
+  <div id="ctxMenuNormal">
+    <div class="ctx-menu-item" onclick="ctxSplitStart()">✂️ Split at point…</div>
+    <div class="ctx-menu-item" onclick="ctxMerge()">🔗 Merge segments</div>
+    <div class="ctx-menu-sep"></div>
+    <div class="ctx-menu-item" onclick="ctxEdit()">✏️ Edit task</div>
+    <div class="ctx-menu-item danger" onclick="ctxClear()">🗑️ Clear dates</div>
+  </div>
+  <div id="ctxMenuSplit" style="display:none;padding:4px">
+    <div style="font-size:11px;color:#888;margin-bottom:6px">Split at date:</div>
+    <input type="date" id="ctxSplitDate" style="background:#1a1a24;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 8px;border-radius:6px;font-size:13px;width:100%;margin-bottom:8px;box-sizing:border-box">
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-save" style="flex:1;font-size:12px;padding:6px" onclick="ctxSplitConfirm()">Split</button>
+      <button class="btn btn-primary" style="flex:1;font-size:12px;padding:6px" onclick="ctxSplitCancel()">Cancel</button>
+    </div>
+  </div>
 </div>
 <script>
 // === DATA ===
@@ -1144,9 +1154,12 @@ function showCtxMenu(e, tid, segIdx){
   CTX_TASK = tid;
   CTX_SEG = segIdx;
   var menu = document.getElementById('ctxMenu');
+  // Reset to normal view
+  document.getElementById('ctxMenuNormal').style.display = 'block';
+  document.getElementById('ctxMenuSplit').style.display = 'none';
   var task = DATA.units[CURRENT_UNIT].tasks[tid];
   // Show/hide merge option (only if has segments)
-  var mergeItem = menu.querySelector('.ctx-menu-item:nth-child(2)');
+  var mergeItem = menu.querySelector('#ctxMenuNormal .ctx-menu-item:nth-child(2)');
   if(task && task.segments && task.segments.length > 1){
     mergeItem.style.display = '';
   } else {
@@ -1164,39 +1177,64 @@ function showCtxMenu(e, tid, segIdx){
     if(r.bottom > window.innerHeight) menu.style.top = (window.innerHeight - r.height - 8) + 'px';
   });
 }
-function hideCtxMenu(){ document.getElementById('ctxMenu').classList.remove('active'); CTX_TASK=null; CTX_SEG=-1; }
-function ctxSplit(){
-  hideCtxMenu();
+function hideCtxMenu(){
+  var menu = document.getElementById('ctxMenu');
+  menu.classList.remove('active');
+  document.getElementById('ctxMenuNormal').style.display = 'block';
+  document.getElementById('ctxMenuSplit').style.display = 'none';
+  CTX_TASK=null; CTX_SEG=-1;
+}
+function ctxSplitStart(){
   if(!CTX_TASK || !CURRENT_UNIT) return;
   var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
   if(!task) return;
-  if(CTX_SEG === -1 && task.segments){
-    // Already has segments — split at a specific segment
-    var segToSplit = prompt('Which segment to split? (1-'+task.segments.length+')');
-    if(!segToSplit) return;
-    var idx = parseInt(segToSplit) - 1;
-    if(isNaN(idx) || idx < 0 || idx >= task.segments.length) return;
-    var seg = task.segments[idx];
-    var splitDate = prompt('Split date (YYYY-MM-DD) — must be between '+seg.s+' and '+seg.e+':');
-    if(!splitDate) return;
-    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment start and end', true); return; }
-    var newSeg1 = {s: seg.s, e: splitDate};
-    var newSeg2 = {s: splitDate, e: seg.e};
-    task.segments.splice(idx, 1, newSeg1, newSeg2);
-  } else if(CTX_SEG === -1 && !task.segments){
-    // No segments yet — split single bar into two
-    var splitDate = prompt('Split date (YYYY-MM-DD) — must be between '+task.s+' and '+task.e+':');
-    if(!splitDate) return;
+  // Determine the date range to show in the input
+  var minDate, maxDate;
+  if(CTX_SEG >= 0 && task.segments){
+    minDate = task.segments[CTX_SEG].s;
+    maxDate = task.segments[CTX_SEG].e;
+  } else if(task.segments && task.segments.length > 0){
+    // For non-segment-specific split on multi-segment task, use first segment
+    minDate = task.segments[0].s;
+    maxDate = task.segments[0].e;
+  } else {
+    minDate = task.s;
+    maxDate = task.e;
+  }
+  var inp = document.getElementById('ctxSplitDate');
+  inp.min = minDate;
+  inp.max = maxDate;
+  inp.value = '';
+  document.getElementById('ctxMenuNormal').style.display = 'none';
+  document.getElementById('ctxMenuSplit').style.display = 'block';
+}
+function ctxSplitCancel(){
+  document.getElementById('ctxMenuNormal').style.display = 'block';
+  document.getElementById('ctxMenuSplit').style.display = 'none';
+  hideCtxMenu();
+}
+function ctxSplitConfirm(){
+  var splitDate = document.getElementById('ctxSplitDate').value;
+  if(!splitDate){ toast('Select a date', true); return; }
+  if(!CTX_TASK || !CURRENT_UNIT) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(!task) return;
+  if(CTX_SEG >= 0 && task.segments){
+    var seg = task.segments[CTX_SEG];
+    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment dates', true); return; }
+    task.segments.splice(CTX_SEG, 1, {s: seg.s, e: splitDate}, {s: splitDate, e: seg.e});
+  } else if(task.segments && task.segments.length > 0){
+    // Default to first segment for non-specific split on multi-segment
+    var seg = task.segments[0];
+    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment dates', true); return; }
+    task.segments.splice(0, 1, {s: seg.s, e: splitDate}, {s: splitDate, e: seg.e});
+  } else {
     if(new Date(splitDate) <= new Date(task.s) || new Date(splitDate) >= new Date(task.e)){ toast('Date must be between start and end', true); return; }
     task.segments = [{s: task.s, e: splitDate}, {s: splitDate, e: task.e}];
-  } else {
-    // Split a specific segment
-    var seg = task.segments[CTX_SEG];
-    var splitDate = prompt('Split date (YYYY-MM-DD) — must be between '+seg.s+' and '+seg.e+':');
-    if(!splitDate) return;
-    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment start and end', true); return; }
-    task.segments.splice(CTX_SEG, 1, {s: seg.s, e: splitDate}, {s: splitDate, e: seg.e});
   }
+  document.getElementById('ctxMenuNormal').style.display = 'block';
+  document.getElementById('ctxMenuSplit').style.display = 'none';
+  hideCtxMenu();
   renderUnit(CURRENT_UNIT); autoSave(); toast('Split');
 }
 function ctxMerge(){
