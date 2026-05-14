@@ -51,6 +51,15 @@ select:focus{outline:1px solid #5ba3f5}
 .task-row.st-complete .task-label::after{content:'COMPLETE';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:800;letter-spacing:3px;color:rgba(77,186,120,0.55);pointer-events:none;z-index:3}
 .task-row.st-complete .task-name{color:#6a6a6a}
 .task-row.st-complete .task-icon::after{content:' ✓';color:#4dba78;font-size:13px}
+/* Progress bar */
+.task-progress{height:4px;background:#1a1a24;border-radius:2px;margin-top:6px;overflow:hidden;position:relative}
+.task-progress-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.task-progress-fill.green{background:linear-gradient(90deg,#1a4a2e,#4dba78)}
+.task-progress-fill.amber{background:linear-gradient(90deg,#5a4010,#f0a830)}
+.task-progress-fill.red{background:linear-gradient(90deg,#3a1020,#f05070)}
+.task-progress-fill.gray{background:linear-gradient(90deg,#1a1a3a,#5050a0)}
+.task-progress-fill.blue{background:linear-gradient(90deg,#1e3a5f,#5ba3f5)}
+.task-pct{font-size:10px;color:#666;margin-top:2px}
 .task-row:hover{background:#1c1c26}
 .task-label{position:sticky;left:0;z-index:2;min-width:320px;width:320px;padding:8px 16px;display:flex;align-items:center;gap:8px;border-right:1px solid #2a2a3a;background:#16161d}
 .task-row:hover .task-label{background:#1c1c26}
@@ -726,7 +735,25 @@ function renderUnit(uid){
     html += '<div class="task-row st-'+st+'">';
     html += '<div class="task-label">';
     if(icon) html += '<span class="task-icon">'+icon+'</span>';
-    html += '<div><div class="task-name">'+esc(taskName)+'</div><div class="task-note">'+esc(taskNote)+'</div></div></div>';
+    // Progress bar calculation
+    var progPct = 0, progColor = 'gray';
+    if(st === 'complete'){ progPct = 100; progColor = 'green'; }
+    else if(s && e){
+      var tStart = new Date(s).getTime(), tEnd = new Date(e).getTime(), tNow = Date.now();
+      if(tNow <= tStart) progPct = 0;
+      else if(tNow >= tEnd) progPct = 100;
+      else progPct = Math.round((tNow - tStart) / (tEnd - tStart) * 100);
+      if(st === 'critical') progColor = 'red';
+      else if(st === 'blocked') progColor = 'red';
+      else if(st === 'inprogress') progColor = 'amber';
+      else if(st === 'ordered') progColor = 'blue';
+      else progColor = 'gray';
+    }
+    html += '<div><div class="task-name">'+esc(taskName)+'</div><div class="task-note">'+esc(taskNote)+'</div>';
+    if(s && e && st !== 'complete'){
+      html += '<div class="task-progress"><div class="task-progress-fill '+progColor+'" style="width:'+progPct+'%"></div></div><div class="task-pct">'+progPct+'%</div>';
+    }
+    html += '</div></div>';
     html += '<div class="task-timeline"><div class="today-line" style="left:'+tp+'%"></div>';
     // Add month grid lines at actual month boundaries
     for(var m=1;m<=12;m++){
