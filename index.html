@@ -47,6 +47,8 @@ select:focus{outline:1px solid #5ba3f5}
 .task-row.st-blocked{border-left-color:#8a5020}
 .task-row.st-pending{border-left-color:#353560}
 .task-row.st-ordered{border-left-color:#1d7a44}
+.task-row.st-complete .task-label{background:rgba(34,102,61,0.28);position:relative;overflow:hidden}
+.task-row.st-complete .task-label::after{content:'COMPLETE';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:800;letter-spacing:3px;color:rgba(77,186,120,0.55);pointer-events:none;z-index:3}
 .task-row.st-complete .task-name{color:#6a6a6a}
 .task-row.st-complete .task-icon::after{content:' ✓';color:#4dba78;font-size:13px}
 .task-row:hover{background:#1c1c26}
@@ -69,8 +71,7 @@ select:focus{outline:1px solid #5ba3f5}
 .bar .handle-left{left:0;cursor:ew-resize}
 .bar .handle-right{right:0;cursor:ew-resize}
 .bar .handle:hover{background:rgba(91,163,245,.18)}
-.bar.complete{background:linear-gradient(90deg,#1a4a2e,#22663d);border:1px solid #2d8a52;color:#4dba78;position:relative}
-.bar.complete .bar-complete-label{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:rgba(77,186,120,0.7);pointer-events:none}
+.bar.complete{background:linear-gradient(90deg,#1a4a2e,#22663d);border:1px solid #2d8a52;color:#4dba78}
 .bar.inprogress{background:linear-gradient(90deg,#3a2a10,#5a4010);border:1px solid #8a6420;color:#f0a830}
 .bar.pending{background:linear-gradient(90deg,#1a1a3a,#252545);border:1px solid #353560;color:#7878c0}
 .bar.critical{background:linear-gradient(90deg,#3a1020,#5a1830);border:1px solid #8a2040;color:#f05070}
@@ -721,10 +722,10 @@ function renderUnit(uid){
       if(!showDatesInside){
         // Short tasks: Dates outside, before the bar
         html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(s)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+dateStr+'</div>';
-        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div>'+(st==='complete'?'<span class="bar-complete-label">COMPLETE</span>':'')+'</div>';
+        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div></div>';
       } else {
         // Longer tasks: Dates centered inside the bar
-        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div>'+(st==='complete'?'<span class="bar-complete-label">COMPLETE</span>':'')+'</div>';
+        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div></div>';
       }
     } else {
       var clickText = LANG==='el' ? '+ Κάντε κλικ για να ορίσετε ημερομηνίες' : '+ Click to set dates';
