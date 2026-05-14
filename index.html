@@ -77,6 +77,21 @@ select:focus{outline:1px solid #5ba3f5}
 .bar.critical{background:linear-gradient(90deg,#3a1020,#5a1830);border:1px solid #8a2040;color:#f05070}
 .bar.blocked{background:linear-gradient(90deg,#3a2010,#5a3010);border:1px solid #8a5020;color:#f08030}
 .bar.ordered{background:linear-gradient(90deg,#0d3320,#14512e);border:1px solid #1d7a44;color:#3ddc6e}
+/* Bar menu button */
+.bar-menu-btn{position:absolute;right:-6px;top:-8px;width:20px;height:20px;border-radius:4px;background:#2a2a4a;border:1px solid #4a4a6a;color:#aaa;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;opacity:0;transition:opacity 0.15s;padding:0;line-height:1}
+.bar:hover .bar-menu-btn,.bar-menu-btn:focus{opacity:1}
+.bar-menu-btn:hover{background:#3a3a5a;color:#fff}
+/* Segment gap style */
+.bar-segment{border-radius:6px;position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;min-width:4px}
+.bar-segment-gap{position:absolute;top:50%;transform:translateY(-50%);height:2px;border-top:2px dashed rgba(255,255,255,0.15);z-index:0}
+/* Context menu */
+.ctx-menu{display:none;position:fixed;z-index:60;background:#1e1e2e;border:1px solid #3a3a5a;border-radius:10px;padding:6px;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.ctx-menu.active{display:block}
+.ctx-menu-item{padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;color:#ccc;display:flex;align-items:center;gap:10px;transition:background 0.1s}
+.ctx-menu-item:hover{background:#2a2a4a;color:#fff}
+.ctx-menu-item.danger{color:#f05070}
+.ctx-menu-item.danger:hover{background:#3a1020}
+.ctx-menu-sep{height:1px;background:#2a2a3a;margin:4px 8px}
 /* Procurement grid */
 .procurement-grid{margin-bottom:24px;background:#16161d;border:1px solid #1d7a44;border-radius:12px;padding:20px 24px}
 .procurement-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
@@ -280,6 +295,14 @@ body.client-mode .notes-section h3 button{display:none!important}
 <div class="toast" id="toast"></div>
 <div class="drag-tooltip" id="dragTooltip"></div>
 
+<!-- Bar context menu -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-menu-item" onclick="ctxSplit()">✂️ Split at point…</div>
+  <div class="ctx-menu-item" onclick="ctxMerge()">🔗 Merge segments</div>
+  <div class="ctx-menu-sep"></div>
+  <div class="ctx-menu-item" onclick="ctxEdit()">✏️ Edit task</div>
+  <div class="ctx-menu-item danger" onclick="ctxClear()">🗑️ Clear dates</div>
+</div>
 <script>
 // === DATA ===
 var DATA = null;
@@ -713,19 +736,41 @@ function renderUnit(uid){
       }
     }
     if(s && e){
-      var dateStr = fmt(s)+' → '+fmt(e);
-      // Calculate bar width as percentage of timeline
-      var barPct = parseFloat(wid(s,e));
-      // If bar spans more than 5% of timeline (~18 days), show dates inside
-      var showDatesInside = barPct > 5;
-      
-      if(!showDatesInside){
-        // Short tasks: Dates outside, before the bar
-        html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(s)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+dateStr+'</div>';
-        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div></div>';
+      // Check for segments
+      var segs = task.segments || null;
+      if(segs && segs.length > 1){
+        // Multi-segment rendering
+        segs.forEach(function(seg, si){
+          var segS = seg.s, segE = seg.e;
+          if(!segS || !segE) return;
+          var segDateStr = fmt(segS)+' → '+fmt(segE);
+          var segBarPct = parseFloat(wid(segS, segE));
+          var showSegDatesInside = segBarPct > 5;
+          if(!showSegDatesInside){
+            html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(segS)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+segDateStr+'</div>';
+          }
+          html += '<div class="bar-segment bar '+st+'" data-tid="'+t.id+'" data-seg="'+si+'" data-start="'+segS+'" data-end="'+segE+'" style="left:calc('+lft(segS)+' + 2px);width:calc('+wid(segS,segE)+' - 4px)"><div class="handle handle-left"></div>'+(showSegDatesInside?'<span class="bar-date">'+segDateStr+'</span>':'')+'<div class="handle handle-right"></div><button class="bar-menu-btn" onclick="event.stopPropagation();event.preventDefault();showCtxMenu(event,'+JSON.stringify(t.id)+','+si+')">⋮</button></div>';
+          // Draw dashed gap between segments (except after last)
+          if(si < segs.length - 1){
+            var gapS = segE, gapE = segs[si+1].s;
+            if(gapS && gapE){
+              var gapL = lft(gapS), gapW = wid(gapS, gapE);
+              html += '<div class="bar-segment-gap" style="left:'+gapL+';width:'+gapW+'"></div>';
+            }
+          }
+        });
       } else {
-        // Longer tasks: Dates centered inside the bar
-        html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div></div>';
+        // Original single-bar rendering (unchanged behavior)
+        var dateStr = fmt(s)+' → '+fmt(e);
+        var barPct = parseFloat(wid(s,e));
+        var showDatesInside = barPct > 5;
+        
+        if(!showDatesInside){
+          html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(s)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+dateStr+'</div>';
+          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="event.stopPropagation();event.preventDefault();showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
+        } else {
+          html += '<div class="bar '+st+'" data-tid="'+t.id+'" data-start="'+s+'" data-end="'+e+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)"><div class="handle handle-left"></div><span class="bar-date">'+dateStr+'</span><div class="handle handle-right"></div><button class="bar-menu-btn" onclick="event.stopPropagation();event.preventDefault();showCtxMenu(event,'+JSON.stringify(t.id)+',-1)">⋮</button></div>';
+        }
       }
     } else {
       var clickText = LANG==='el' ? '+ Κάντε κλικ για να ορίσετε ημερομηνίες' : '+ Click to set dates';
@@ -1038,8 +1083,18 @@ function endBarDrag(e){
   hideDragTip();
   if(!moved){ BAR_DRAG=null; if(tid) openEditor(tid); return; }
   if(CURRENT_UNIT && tid && DATA.units[CURRENT_UNIT].tasks && DATA.units[CURRENT_UNIT].tasks[tid]){
-    DATA.units[CURRENT_UNIT].tasks[tid].s=bar.dataset.start;
-    DATA.units[CURRENT_UNIT].tasks[tid].e=bar.dataset.end;
+    var task = DATA.units[CURRENT_UNIT].tasks[tid];
+    if(task.segments && bar.dataset.seg !== undefined && bar.dataset.seg !== '-1'){
+      // Update the specific segment
+      var segIdx = parseInt(bar.dataset.seg);
+      if(task.segments[segIdx]){
+        task.segments[segIdx].s = bar.dataset.start;
+        task.segments[segIdx].e = bar.dataset.end;
+      }
+    } else {
+      task.s = bar.dataset.start;
+      task.e = bar.dataset.end;
+    }
     autoSave();
     renderUnit(CURRENT_UNIT); // Re-render to recalculate date positions
     toast('Updated');
@@ -1048,7 +1103,7 @@ function endBarDrag(e){
 }
 function enableBarDrag(){
   if(window.IS_READONLY) return;
-  document.querySelectorAll('.bar').forEach(bar=>{ bar.style.cursor='grab'; bar.onmousedown=e=>{e.stopPropagation();e.preventDefault();startBarDrag(bar,e);}; });
+  document.querySelectorAll('.bar, .bar-segment').forEach(bar=>{ bar.style.cursor='grab'; bar.onmousedown=e=>{e.stopPropagation();e.preventDefault();startBarDrag(bar,e);}; });
 }
 
 // === LANG ===
@@ -1065,6 +1120,93 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){ closeEditor(); closeNoteEditor(); }
   if(e.key==='s' && (e.metaKey||e.ctrlKey)){ e.preventDefault(); saveData(); }
 });
+
+// === BAR CONTEXT MENU ===
+var CTX_TASK = null;
+var CTX_SEG = -1;
+function showCtxMenu(e, tid, segIdx){
+  if(window.IS_READONLY) return;
+  CTX_TASK = tid;
+  CTX_SEG = segIdx;
+  var menu = document.getElementById('ctxMenu');
+  var task = DATA.units[CURRENT_UNIT].tasks[tid];
+  // Show/hide merge option (only if has segments)
+  var mergeItem = menu.querySelector('.ctx-menu-item:nth-child(2)');
+  if(task && task.segments && task.segments.length > 1){
+    mergeItem.style.display = '';
+  } else {
+    mergeItem.style.display = 'none';
+  }
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = (e.clientY - 10) + 'px';
+  menu.classList.add('active');
+  // Adjust if off-screen right
+  requestAnimationFrame(function(){
+    var r = menu.getBoundingClientRect();
+    if(r.right > window.innerWidth) menu.style.left = (window.innerWidth - r.width - 8) + 'px';
+    if(r.bottom > window.innerHeight) menu.style.top = (window.innerHeight - r.height - 8) + 'px';
+  });
+}
+function hideCtxMenu(){ document.getElementById('ctxMenu').classList.remove('active'); CTX_TASK=null; CTX_SEG=-1; }
+function ctxSplit(){
+  hideCtxMenu();
+  if(!CTX_TASK || !CURRENT_UNIT) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(!task) return;
+  if(CTX_SEG === -1 && task.segments){
+    // Already has segments — split at a specific segment
+    var segToSplit = prompt('Which segment to split? (1-'+task.segments.length+')');
+    if(!segToSplit) return;
+    var idx = parseInt(segToSplit) - 1;
+    if(isNaN(idx) || idx < 0 || idx >= task.segments.length) return;
+    var seg = task.segments[idx];
+    var splitDate = prompt('Split date (YYYY-MM-DD) — must be between '+seg.s+' and '+seg.e+':');
+    if(!splitDate) return;
+    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment start and end', true); return; }
+    var newSeg1 = {s: seg.s, e: splitDate};
+    var newSeg2 = {s: splitDate, e: seg.e};
+    task.segments.splice(idx, 1, newSeg1, newSeg2);
+  } else if(CTX_SEG === -1 && !task.segments){
+    // No segments yet — split single bar into two
+    var splitDate = prompt('Split date (YYYY-MM-DD) — must be between '+task.s+' and '+task.e+':');
+    if(!splitDate) return;
+    if(new Date(splitDate) <= new Date(task.s) || new Date(splitDate) >= new Date(task.e)){ toast('Date must be between start and end', true); return; }
+    task.segments = [{s: task.s, e: splitDate}, {s: splitDate, e: task.e}];
+  } else {
+    // Split a specific segment
+    var seg = task.segments[CTX_SEG];
+    var splitDate = prompt('Split date (YYYY-MM-DD) — must be between '+seg.s+' and '+seg.e+':');
+    if(!splitDate) return;
+    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment start and end', true); return; }
+    task.segments.splice(CTX_SEG, 1, {s: seg.s, e: splitDate}, {s: splitDate, e: seg.e});
+  }
+  renderUnit(CURRENT_UNIT); autoSave(); toast('Split');
+}
+function ctxMerge(){
+  hideCtxMenu();
+  if(!CTX_TASK || !CURRENT_UNIT) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(!task || !task.segments || task.segments.length < 2) return;
+  // Merge all segments into single bar: earliest start, latest end
+  var allDates = task.segments.map(function(s){ return [new Date(s.s), new Date(s.e)]; });
+  var earliest = new Date(Math.min.apply(null, allDates.map(function(d){return d[0]})));
+  var latest = new Date(Math.max.apply(null, allDates.map(function(d){return d[1]})));
+  task.s = earliest.toISOString().slice(0,10);
+  task.e = latest.toISOString().slice(0,10);
+  delete task.segments;
+  renderUnit(CURRENT_UNIT); autoSave(); toast('Merged');
+}
+function ctxEdit(){ hideCtxMenu(); if(CTX_TASK) openEditor(CTX_TASK); }
+function ctxClear(){
+  hideCtxMenu();
+  if(!CTX_TASK || !CURRENT_UNIT) return;
+  if(!confirm('Clear all dates for this task?')) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(task){ delete task.s; delete task.e; delete task.segments; }
+  renderUnit(CURRENT_UNIT); autoSave(); toast('Cleared');
+}
+// Close context menu on any click outside
+document.addEventListener('mousedown', function(e){ if(!e.target.closest('.ctx-menu') && !e.target.closest('.bar-menu-btn')) hideCtxMenu(); });
 
 // === START ===
 function editHandover(){
