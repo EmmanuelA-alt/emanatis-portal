@@ -297,21 +297,12 @@ body.client-mode .notes-section h3 button{display:none!important}
 
 <!-- Bar context menu -->
 <div class="ctx-menu" id="ctxMenu">
-  <div id="ctxMenuNormal">
-    <div class="ctx-menu-item" onclick="ctxSplitStart()">✂️ Split at point…</div>
-    <div class="ctx-menu-item" onclick="ctxMerge()">🔗 Merge segments</div>
-    <div class="ctx-menu-sep"></div>
-    <div class="ctx-menu-item" onclick="ctxEdit()">✏️ Edit task</div>
-    <div class="ctx-menu-item danger" onclick="ctxClear()">🗑️ Clear dates</div>
-  </div>
-  <div id="ctxMenuSplit" style="display:none;padding:4px">
-    <div style="font-size:11px;color:#888;margin-bottom:6px">Split at date:</div>
-    <input type="date" id="ctxSplitDate" style="background:#1a1a24;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 8px;border-radius:6px;font-size:13px;width:100%;margin-bottom:8px;box-sizing:border-box">
-    <div style="display:flex;gap:6px">
-      <button class="btn btn-save" style="flex:1;font-size:12px;padding:6px" onclick="ctxSplitConfirm()">Split</button>
-      <button class="btn btn-primary" style="flex:1;font-size:12px;padding:6px" onclick="ctxSplitCancel()">Cancel</button>
-    </div>
-  </div>
+  <div class="ctx-menu-item" onclick="ctxAddTimeline()">➕ Add timeline</div>
+  <div class="ctx-menu-item" onclick="ctxRemoveTimeline()">➖ Remove this timeline</div>
+  <div class="ctx-menu-item" onclick="ctxMerge()">🔗 Merge all</div>
+  <div class="ctx-menu-sep"></div>
+  <div class="ctx-menu-item" onclick="ctxEdit()">✏️ Edit task</div>
+  <div class="ctx-menu-item danger" onclick="ctxClear()">🗑️ Clear all dates</div>
 </div>
 <script>
 // === DATA ===
@@ -1154,23 +1145,25 @@ function showCtxMenu(e, tid, segIdx){
   CTX_TASK = tid;
   CTX_SEG = segIdx;
   var menu = document.getElementById('ctxMenu');
-  // Reset to normal view
-  document.getElementById('ctxMenuNormal').style.display = 'block';
-  document.getElementById('ctxMenuSplit').style.display = 'none';
   var task = DATA.units[CURRENT_UNIT].tasks[tid];
-  // Show/hide merge option (only if has segments)
-  var mergeItem = menu.querySelector('#ctxMenuNormal .ctx-menu-item:nth-child(2)');
-  if(task && task.segments && task.segments.length > 1){
-    mergeItem.style.display = '';
+  var items = menu.querySelectorAll('.ctx-menu-item');
+  // Show/hide remove option (only on specific segment, not on single bar)
+  if(segIdx >= 0){
+    items[1].style.display = '';
   } else {
-    mergeItem.style.display = 'none';
+    items[1].style.display = 'none';
+  }
+  // Show/hide merge option (only if has segments)
+  if(task && task.segments && task.segments.length > 1){
+    items[2].style.display = '';
+  } else {
+    items[2].style.display = 'none';
   }
   var cx = ev ? ev.clientX : 200;
   var cy = ev ? ev.clientY : 200;
   menu.style.left = cx + 'px';
   menu.style.top = cy + 'px';
   menu.classList.add('active');
-  // Adjust if off-screen right
   requestAnimationFrame(function(){
     var r = menu.getBoundingClientRect();
     if(r.right > window.innerWidth) menu.style.left = (window.innerWidth - r.width - 8) + 'px';
@@ -1178,64 +1171,44 @@ function showCtxMenu(e, tid, segIdx){
   });
 }
 function hideCtxMenu(){
-  var menu = document.getElementById('ctxMenu');
-  menu.classList.remove('active');
-  document.getElementById('ctxMenuNormal').style.display = 'block';
-  document.getElementById('ctxMenuSplit').style.display = 'none';
+  document.getElementById('ctxMenu').classList.remove('active');
   CTX_TASK=null; CTX_SEG=-1;
 }
-function ctxSplitStart(){
-  if(!CTX_TASK || !CURRENT_UNIT) return;
-  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
-  if(!task) return;
-  // Determine the date range to show in the input
-  var minDate, maxDate;
-  if(CTX_SEG >= 0 && task.segments){
-    minDate = task.segments[CTX_SEG].s;
-    maxDate = task.segments[CTX_SEG].e;
-  } else if(task.segments && task.segments.length > 0){
-    // For non-segment-specific split on multi-segment task, use first segment
-    minDate = task.segments[0].s;
-    maxDate = task.segments[0].e;
-  } else {
-    minDate = task.s;
-    maxDate = task.e;
-  }
-  var inp = document.getElementById('ctxSplitDate');
-  inp.min = minDate;
-  inp.max = maxDate;
-  inp.value = '';
-  document.getElementById('ctxMenuNormal').style.display = 'none';
-  document.getElementById('ctxMenuSplit').style.display = 'block';
-}
-function ctxSplitCancel(){
-  document.getElementById('ctxMenuNormal').style.display = 'block';
-  document.getElementById('ctxMenuSplit').style.display = 'none';
+function ctxAddTimeline(){
   hideCtxMenu();
-}
-function ctxSplitConfirm(){
-  var splitDate = document.getElementById('ctxSplitDate').value;
-  if(!splitDate){ toast('Select a date', true); return; }
   if(!CTX_TASK || !CURRENT_UNIT) return;
   var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
   if(!task) return;
-  if(CTX_SEG >= 0 && task.segments){
-    var seg = task.segments[CTX_SEG];
-    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment dates', true); return; }
-    task.segments.splice(CTX_SEG, 1, {s: seg.s, e: splitDate}, {s: splitDate, e: seg.e});
-  } else if(task.segments && task.segments.length > 0){
-    // Default to first segment for non-specific split on multi-segment
+  if(!task.segments){
+    // Convert single bar to segments first
+    task.segments = [{s: task.s, e: task.e}];
+  }
+  // Add new segment 7 days after the last segment ends
+  var lastSeg = task.segments[task.segments.length - 1];
+  var lastEnd = new Date(lastSeg.e);
+  var newStart = new Date(lastEnd.getTime() + 86400000); // +1 day
+  var newEnd = new Date(newStart.getTime() + 7 * 86400000); // +7 days
+  var fmtDate = function(d){ return d.toISOString().slice(0,10); };
+  task.segments.push({s: fmtDate(newStart), e: fmtDate(newEnd)});
+  renderUnit(CURRENT_UNIT); autoSave(); toast('Timeline added');
+}
+function ctxRemoveTimeline(){
+  hideCtxMenu();
+  if(!CTX_TASK || !CURRENT_UNIT) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(!task) return;
+  if(CTX_SEG >= 0 && task.segments && task.segments.length > 1){
+    task.segments.splice(CTX_SEG, 1);
+  } else if(CTX_SEG >= 0 && task.segments && task.segments.length === 1){
+    // Last segment — revert to single bar
     var seg = task.segments[0];
-    if(new Date(splitDate) <= new Date(seg.s) || new Date(splitDate) >= new Date(seg.e)){ toast('Date must be between segment dates', true); return; }
-    task.segments.splice(0, 1, {s: seg.s, e: splitDate}, {s: splitDate, e: seg.e});
-  } else {
-    if(new Date(splitDate) <= new Date(task.s) || new Date(splitDate) >= new Date(task.e)){ toast('Date must be between start and end', true); return; }
-    task.segments = [{s: task.s, e: splitDate}, {s: splitDate, e: task.e}];
+    task.s = seg.s; task.e = seg.e;
+    delete task.segments;
+  } else if(!task.segments){
+    // Single bar — clear dates
+    delete task.s; delete task.e;
   }
-  document.getElementById('ctxMenuNormal').style.display = 'block';
-  document.getElementById('ctxMenuSplit').style.display = 'none';
-  hideCtxMenu();
-  renderUnit(CURRENT_UNIT); autoSave(); toast('Split');
+  renderUnit(CURRENT_UNIT); autoSave(); toast('Timeline removed');
 }
 function ctxMerge(){
   hideCtxMenu();
