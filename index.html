@@ -1110,6 +1110,7 @@ function enableBarDrag(){
 function enableBarMenus(){
   if(window.IS_READONLY) return;
   document.querySelectorAll('.bar-menu-btn').forEach(function(btn){
+    btn.onmousedown = function(e){ e.stopPropagation(); e.preventDefault(); };
     btn.onclick = function(e){
       e.stopPropagation();
       e.preventDefault();
@@ -1175,44 +1176,43 @@ function hideCtxMenu(){
   CTX_TASK=null; CTX_SEG=-1;
 }
 function ctxAddTimeline(){
+  var tid = CTX_TASK;
   hideCtxMenu();
-  if(!CTX_TASK || !CURRENT_UNIT) return;
-  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(!tid || !CURRENT_UNIT) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[tid];
   if(!task) return;
   if(!task.segments){
-    // Convert single bar to segments first
     task.segments = [{s: task.s, e: task.e}];
   }
-  // Add new segment 7 days after the last segment ends
   var lastSeg = task.segments[task.segments.length - 1];
   var lastEnd = new Date(lastSeg.e);
-  var newStart = new Date(lastEnd.getTime() + 86400000); // +1 day
-  var newEnd = new Date(newStart.getTime() + 7 * 86400000); // +7 days
+  var newStart = new Date(lastEnd.getTime() + 86400000);
+  var newEnd = new Date(newStart.getTime() + 7 * 86400000);
   var fmtDate = function(d){ return d.toISOString().slice(0,10); };
   task.segments.push({s: fmtDate(newStart), e: fmtDate(newEnd)});
   renderUnit(CURRENT_UNIT); autoSave(); toast('Timeline added');
 }
 function ctxRemoveTimeline(){
+  var tid = CTX_TASK, seg = CTX_SEG;
   hideCtxMenu();
-  if(!CTX_TASK || !CURRENT_UNIT) return;
-  var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
+  if(!tid || !CURRENT_UNIT) return;
+  var task = DATA.units[CURRENT_UNIT].tasks[tid];
   if(!task) return;
-  if(CTX_SEG >= 0 && task.segments && task.segments.length > 1){
-    task.segments.splice(CTX_SEG, 1);
-  } else if(CTX_SEG >= 0 && task.segments && task.segments.length === 1){
-    // Last segment — revert to single bar
-    var seg = task.segments[0];
-    task.s = seg.s; task.e = seg.e;
+  if(seg >= 0 && task.segments && task.segments.length > 1){
+    task.segments.splice(seg, 1);
+  } else if(seg >= 0 && task.segments && task.segments.length === 1){
+    var s = task.segments[0];
+    task.s = s.s; task.e = s.e;
     delete task.segments;
   } else if(!task.segments){
-    // Single bar — clear dates
     delete task.s; delete task.e;
   }
   renderUnit(CURRENT_UNIT); autoSave(); toast('Timeline removed');
 }
 function ctxMerge(){
+  var tid = CTX_TASK;
   hideCtxMenu();
-  if(!CTX_TASK || !CURRENT_UNIT) return;
+  if(!tid || !CURRENT_UNIT) return;
   var task = DATA.units[CURRENT_UNIT].tasks[CTX_TASK];
   if(!task || !task.segments || task.segments.length < 2) return;
   // Merge all segments into single bar: earliest start, latest end
