@@ -40,15 +40,15 @@ select:focus{outline:1px solid #5ba3f5}
 .gh-month{position:absolute;top:0;height:42px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#5ba3f5;letter-spacing:1px;text-transform:uppercase;border-right:2px solid #3a3a5a;background:#1a1a24;overflow:visible}
 .section-hdr{background:#08080e;padding:12px 16px;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#5ba3f5;border-bottom:2px solid #1e3a5f;border-top:3px solid #2a2a3a}
 .section-hdr-label{position:sticky;left:0;z-index:11;background:#08080e;padding-right:16px}
-.task-row{display:flex;border-bottom:1px solid #1e1e28;align-items:stretch;min-height:52px;transition:background 0.15s;border-left:3px solid transparent;position:relative}
+.task-row{display:flex;border-bottom:1px solid #1e1e28;align-items:stretch;min-height:52px;transition:background 0.15s;border-left:3px solid transparent;position:relative;overflow:hidden}
 .task-row.st-complete{border-left-color:#2d8a52}
 .task-row.st-inprogress{border-left-color:#8a6420}
 .task-row.st-critical{border-left-color:#8a2040}
 .task-row.st-blocked{border-left-color:#8a5020}
 .task-row.st-pending{border-left-color:#353560}
 .task-row.st-ordered{border-left-color:#1d7a44}
-.task-row.st-complete .task-label{background:rgba(34,102,61,0.28);overflow:hidden;z-index:10}
-.task-row.st-complete .task-label::after{content:'COMPLETE';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:800;letter-spacing:3px;color:rgba(77,186,120,0.55);pointer-events:none;z-index:3}
+.task-row.st-complete .task-label{background:#16161d;overflow:hidden;z-index:10}
+.task-row.st-complete .task-label::after{content:''}
 .task-row.st-complete .task-name{color:#6a6a6a}
 .task-row.st-complete .task-icon::after{content:' ✓';color:#4dba78;font-size:13px}
 /* Progress bar */
@@ -352,9 +352,10 @@ function computeTimelineRange(){
       });
     });
   }
-  // Extend 1 month before earliest, 2 months after latest
+  // Floor: Jan 2026, 1 month buffer before. Ceiling: at least Dec 2027, extended if tasks go further
   TS = new Date(earliest.getFullYear(), earliest.getMonth() - 1, 1);
-  TE = new Date(latest.getFullYear(), latest.getMonth() + 3, 0);
+  var minEnd = new Date('2027-12-31');
+  TE = latest > minEnd ? new Date(latest.getFullYear(), latest.getMonth() + 3, 0) : new Date(2027, 11, 31);
   TD = (TE - TS) / 86400000;
   buildMonths();
 }
@@ -779,7 +780,7 @@ function renderUnit(uid){
       else progColor = 'gray';
     }
     html += '<div><div class="task-name">'+esc(taskName)+'</div><div class="task-note">'+esc(taskNote)+'</div>';
-    if(s && e && st !== 'complete'){
+    if(s && e){
       html += '<div class="task-progress"><div class="task-progress-fill '+progColor+'" style="width:'+progPct+'%"></div></div><div class="task-pct">'+progPct+'%</div>';
     }
     html += '</div></div>';
