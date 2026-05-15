@@ -87,7 +87,7 @@ select:focus{outline:1px solid #5ba3f5}
 .bar.blocked{background:linear-gradient(90deg,#3a2010,#5a3010);border:1px solid #8a5020;color:#f08030}
 .bar.ordered{background:linear-gradient(90deg,#0d3320,#14512e);border:1px solid #1d7a44;color:#3ddc6e}
 /* Bar menu button */
-.bar-menu-btn{position:absolute;right:-6px;top:-8px;width:20px;height:20px;border-radius:4px;background:#2a2a4a;border:1px solid #4a4a6a;color:#ccc;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;opacity:0.85;transition:opacity 0.15s;padding:0;line-height:1}
+.bar-menu-btn{position:absolute;right:-6px;top:-8px;width:20px;height:20px;border-radius:4px;background:#2a2a4a;border:1px solid #4a4a6a;color:#aaa;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;opacity:0.6;transition:opacity 0.15s;padding:0;line-height:1}
 .bar:hover .bar-menu-btn{opacity:1}
 .bar-menu-btn:hover{background:#3a3a5a;color:#fff;opacity:1}
 /* Segment gap style */
@@ -210,7 +210,6 @@ body.client-mode .notes-section h3 button{display:none!important}
   <div class="header-right">
     <div class="live-indicator"><div class="live-dot"></div><span class="live-text">LIVE</span></div>
     <select id="unitSelect"><option value="">— Select Unit —</option></select>
-    <button class="btn btn-primary" onclick="addNewTask()" title="Add Task">+ Add Task</button>
     <button class="btn btn-save" onclick="saveData()" title="Save">💾 Save</button>
     <button class="btn btn-primary" onclick="exportJSON()" title="Download">⬇ Export</button>
     <button class="btn btn-primary" onclick="printTimeline()" title="Print/PDF">🖨 Print</button>
@@ -331,34 +330,7 @@ var TS = new Date('2026-01-01');
 var TE = new Date('2026-12-31');
 var TD = (TE - TS) / 86400000;
 var MONTHS = [];
-
-function computeTimelineRange(){
-  var earliest = new Date('2026-01-01'), latest = new Date('2026-12-31');
-  var data = (typeof DATA !== 'undefined' && DATA && DATA.units) ? DATA.units : null;
-  if(data){
-    Object.keys(data).forEach(uid => {
-      var u = data[uid];
-      if(!u || !u.tasks) return;
-      Object.keys(u.tasks).forEach(tid => {
-        var t = u.tasks[tid];
-        if(t.s){ var d = new Date(t.s); if(d < earliest) earliest = d; }
-        if(t.e){ var d = new Date(t.e); if(d > latest) latest = d; }
-        if(t.segments){
-          t.segments.forEach(seg => {
-            if(seg.s){ var d = new Date(seg.s); if(d < earliest) earliest = d; }
-            if(seg.e){ var d = new Date(seg.e); if(d > latest) latest = d; }
-          });
-        }
-      });
-    });
-  }
-  // Extend 1 month before earliest, 2 months after latest
-  TS = new Date(earliest.getFullYear(), earliest.getMonth() - 1, 1);
-  TE = new Date(latest.getFullYear(), latest.getMonth() + 3, 0);
-  TD = (TE - TS) / 86400000;
-  buildMonths();
-}
-computeTimelineRange();
+buildMonths();
 
 // === GREEK NOTE TRANSLATIONS ===
 var NOTE_LABELS_EL = {
@@ -665,7 +637,6 @@ function populateSelect(){
 // === RENDER ===
 function renderUnit(uid){
   CURRENT_UNIT = uid;
-  computeTimelineRange();
   var unit = DATA.units[uid];
   var tmpl = DATA.taskTemplate;
   var tasks = unit.tasks || {};
@@ -729,10 +700,10 @@ function renderUnit(uid){
   html += '<div class="gantt-wrap"><div class="gantt-inner">';
   html += '<div class="gantt-header-row"><div class="gh-label">Task</div><div class="gh-months">';
   // Render months with width proportional to days
-  for(var mi=0;mi<MONTHS.length;mi++){
-    var monthsSinceTS = (new Date(TS.getFullYear(), TS.getMonth()+mi+1, 1) - new Date(TS.getFullYear(), TS.getMonth(), 1)) / 86400000;
-    var monthStart = new Date(TS.getFullYear(), TS.getMonth()+mi, 1);
-    var nextMonthStart = new Date(TS.getFullYear(), TS.getMonth()+mi+1, 1);
+  for(var mi=0;mi<12;mi++){
+    var monthStart = new Date(2026, mi, 1);
+    var monthEnd = new Date(2026, mi+1, 0); // Last day of month
+    var nextMonthStart = new Date(2026, mi+1, 1);
     var monthWid = wid(monthStart.toISOString().slice(0,10), nextMonthStart.toISOString().slice(0,10));
     var monthLeft = lft(monthStart.toISOString().slice(0,10));
     html+='<div class="gh-month" style="position:absolute;left:'+monthLeft+';width:'+monthWid+'">'+MONTHS[mi]+'</div>';
@@ -785,8 +756,8 @@ function renderUnit(uid){
     html += '</div></div>';
     html += '<div class="task-timeline"><div class="today-line" style="left:'+tp+'%"></div>';
     // Add month grid lines at actual month boundaries
-    for(var m=0;m<MONTHS.length;m++){
-      var monthStart = new Date(TS.getFullYear(), TS.getMonth()+m+1, 1); // First day of each month
+    for(var m=1;m<=12;m++){
+      var monthStart = new Date(2026, m, 1); // First day of each month (0-indexed months)
       if(monthStart <= TE){
         var linePct = pct(monthStart.toISOString().slice(0,10));
         html += '<div class="month-grid-line" style="left:'+linePct+'%"></div>';
@@ -876,24 +847,6 @@ function renderUnit(uid){
 }
 
 // === EDITORS ===
-function addNewTask(){
-  if(!CURRENT_UNIT || window.IS_READONLY) return;
-  var name = prompt('New task name:');
-  if(!name || !name.trim()) return;
-  var id = 'custom_' + Date.now();
-  // Add to taskTemplate
-  var lastCatIdx = 0;
-  DATA.taskTemplate.forEach(t => { if(t.cat !== undefined && t.cat > lastCatIdx) lastCatIdx = t.cat; });
-  DATA.taskTemplate.push({id: id, nm: name.trim(), cat: lastCatIdx});
-  // Initialize empty task data
-  if(!DATA.units[CURRENT_UNIT].tasks) DATA.units[CURRENT_UNIT].tasks = {};
-  DATA.units[CURRENT_UNIT].tasks[id] = {st: 'pending', s: '', e: '', nt: ''};
-  computeTimelineRange();
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  toast('Task added — click the row to set dates');
-}
-
 function openEditor(tid){
   if(!CURRENT_UNIT || window.IS_READONLY) return;
   EDITING_TASK = tid;
