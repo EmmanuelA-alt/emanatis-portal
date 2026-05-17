@@ -471,9 +471,9 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 // === ICONS FOR TASKS ===
 var TASK_ICONS = {
-  t1:'🏗️',t2:'🛡️',t16:'🔩',t15:'🎨',
+  t1:'🏗️',t2:'🛡️',balfloor:'🧱',pergola:'⛱️',t16:'🔩',t15:'🎨',
   hvac:'♨️',hrv:'💨',t10:'🔧',t11:'⚡',t19:'🚒',t20:'🔐',
-  t6:'🧱',t7:'🪵',t8:'🍳',t9:'🚿',t14:'🖌️',
+  t6:'🧱',t7:'🪵',t8:'🍳',t9:'🚿',t14:'🖌️',jacuzzi:'🛁',
   t4:'🚪',t5:'🚪',t3:'🪟',
   t13:'🛗',t18:'🚗',t17:'🏢',pv:'☀️',pent:'🏗️',
   t24:'🧹',t23:'📋',t22:'🌿',t21:'💡'
@@ -509,6 +509,18 @@ var PROCUREMENT_EL = [
   {name:'Κουζίνα — Παραγγελμένη & Παραληφθείσα', note:'Παραδόθηκε στο εργοτάξιο'},
   {name:'Δάπεδο — Παραγγελμένο & Παραληφθείσα', note:'Έτοιμο για εγκατάσταση'},
   {name:'Ανελκυστήρας (iLift) — Παραγγελμένος', note:'Προηγούμενος προμηθευτής (Kleeman) ακυρώθηκε — αύξηση κόστους, μειωμένη χωρητικότητα'}
+];
+
+// === IN-PROCESS PROCUREMENT (not yet ordered, awaiting client decision) ===
+var INPROCESS_EN = [
+  {name:'Fireplace', note:'Awaiting client selection', icon:'🔥'},
+  {name:'Jacuzzi', note:'Awaiting client selection', icon:'🛁'},
+  {name:'Pergola', note:'Awaiting client selection', icon:'⛱️'}
+];
+var INPROCESS_EL = [
+  {name:'Τζάκι', note:'Αναμονή επιλογής πελάτη', icon:'🔥'},
+  {name:'Τζακούζι', note:'Αναμονή επιλογής πελάτη', icon:'🛁'},
+  {name:'Πέργκολα', note:'Αναμονή επιλογής πελάτη', icon:'⛱️'}
 ];
 
 // === INIT ===
@@ -725,15 +737,27 @@ function renderUnit(uid){
   html += '<div class="legend-item"><div class="legend-dot" style="background:#14512e;border:1px solid #1d7a44"></div><span>'+(LANG==='el'?'Παραγγελμένο':'Ordered')+'</span></div>';
   html += '</div>';
 
-  // Procurement Grid
+  // Procurement Grid — Ordered
   html += '<div class="procurement-grid">';
   var PROCUREMENT = LANG==='el' ? PROCUREMENT_EL : PROCUREMENT_EN;
-  html += '<div class="procurement-header"><div><div class="procurement-title">'+(LANG==='el'?'Κατάσταση Προμήθειας':'Procurement Status')+'</div><div class="procurement-sub">'+(LANG==='el'?'Όλα παραγγελμένα, επιβεβαιωμένα & σε παραγωγή':'All items ordered, confirmed & in production')+'</div></div><div class="procurement-badge">'+PROCUREMENT.length+' Items Ordered</div></div>';
+  html += '<div class="procurement-header"><div><div class="procurement-title">'+(LANG==='el'?'Κατάσταση Προμήθειας':'Procurement Status')+'</div><div class="procurement-sub">'+(LANG==='el'?'Παραγγελμένα, επιβεβαιωμένα & σε παραγωγή':'Ordered, confirmed & in production')+'</div></div><div class="procurement-badge">✓ '+PROCUREMENT.length+(LANG==='el'?' Items Παραγγελμένα':' Items Ordered')+'</div></div>';
   html += '<div class="procurement-items">';
   PROCUREMENT.forEach(p=>{
-    html += '<div class="procurement-item"><div class="procurement-check">✓</div><div class="procurement-item-name">'+p.name+'</div></div>';
+    html += '<div class="procurement-item"><div class="procurement-check">✓</div><div><div class="procurement-item-name">'+p.name+'</div>'+(p.note?'<div class="procurement-item-note">'+p.note+'</div>':'')+'</div></div>';
   });
   html += '</div></div>';
+
+  // Procurement Grid — In Process
+  var INPROCESS = LANG==='el' ? INPROCESS_EL : INPROCESS_EN;
+  if(INPROCESS.length > 0){
+    html += '<div class="procurement-grid" style="border-color:#8a6420;margin-top:-12px">';
+    html += '<div class="procurement-header"><div><div class="procurement-title" style="color:#f0a830">'+(LANG==='el'?'Σε Διαδικασία Σourcing':'In Process — Awaiting Selection')+'</div><div class="procurement-sub">'+(LANG==='el'?'Αναμονή επιλογής πελάτη πριν την παραγγελία':'Pending client selection before ordering')+'</div></div><div class="procurement-badge" style="background:#3a2a10;border-color:#8a6420;color:#f0a830">⟳ '+INPROCESS.length+(LANG==='el'?' Σε Διαδικασία':' In Process')+'</div></div>';
+    html += '<div class="procurement-items">';
+    INPROCESS.forEach(p=>{
+      html += '<div class="procurement-item" style="border-color:#8a6420;background:#1a1a10"><div class="procurement-check" style="color:#f0a830">'+(p.icon||'⟳')+'</div><div><div class="procurement-item-name">'+p.name+'</div>'+(p.note?'<div class="procurement-item-note">'+p.note+'</div>':'')+'</div></div>';
+    });
+    html += '</div></div>';
+  }
 
   // Gantt
   html += '<div class="gantt-wrap"><div class="gantt-inner">';
