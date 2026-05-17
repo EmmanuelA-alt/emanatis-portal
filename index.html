@@ -811,7 +811,44 @@ function renderUnit(uid){
   var hdStat = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'TBD');
   var hdYr = unit.handoverDate ? '2026' : '';
   html += '<div class="stats">';
-  html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Κατάσταση':'Status')+'</div><div class="svalue" style="color:#f0a830">'+(LANG==='el'?'Σε Εξέλιξη':'In Progress')+'</div><div class="ssub">'+(LANG==='el'?'Πολλά συνεργεία ενεργά':'Multiple trades active')+'</div></div>';
+  // Calculate real completion percentage from task data
+  var completedTasks = counts.complete || 0;
+  var totalTasks = counts.total || 1;
+  var pctComplete = Math.round((completedTasks / totalTasks) * 100);
+  // Also calculate time-based progress for inprogress tasks
+  var timeProgress = 0, timeTotal = 0;
+  Object.values(tasks).forEach(function(t){
+    if(!t.s || !t.e) return;
+    var ts = new Date(t.s).getTime(), te = new Date(t.e).getTime(), tn = Date.now();
+    if(t.st === 'complete'){ timeProgress += 1; timeTotal += 1; }
+    else {
+      var p = tn <= ts ? 0 : (tn >= te ? 1 : (tn - ts) / (te - ts));
+      timeProgress += p; timeTotal += 1;
+    }
+  });
+  var weightedPct = timeTotal > 0 ? Math.round((timeProgress / timeTotal) * 100) : pctComplete;
+  // Use the higher of task-complete % vs time-weighted %
+  var overallPct = Math.max(pctComplete, weightedPct);
+  var pctColor = overallPct >= 80 ? '#4dba78' : overallPct >= 50 ? '#f0a830' : '#f05070';
+  var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : overallPct >= 50 ? (LANG==='el'?'Σε Εξέλιξη':'In Progress') : (LANG==='el'?'Σε Εξέλιξη':'In Progress');
+
+  html += '<div class="stat" style="position:relative">';
+  html += '<div class="slabel">'+(LANG==='el'?'Πρόοδος':'Progress')+'</div>';
+  html += '<div style="display:flex;align-items:center;gap:12px;margin-top:4px">';
+  // Ring
+  html += '<div style="width:52px;height:52px;position:relative;flex-shrink:0">';
+  html += '<svg viewBox="0 0 36 36" style="width:52px;height:52px;transform:rotate(-90deg)">';
+  html += '<circle cx="18" cy="18" r="15.5" fill="none" stroke="#1a1a2a" stroke-width="3"/>';
+  html += '<circle cx="18" cy="18" r="15.5" fill="none" stroke="'+pctColor+'" stroke-width="3" stroke-dasharray="'+(overallPct)+' '+(100-overallPct)+'" stroke-linecap="round"/>';
+  html += '</svg>';
+  html += '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:'+pctColor+'">'+overallPct+'%</div>';
+  html += '</div>';
+  // Labels
+  html += '<div>';
+  html += '<div style="font-size:15px;font-weight:700;color:'+pctColor+'">'+statusLabel+'</div>';
+  html += '<div style="font-size:11px;color:#888;margin-top:2px">'+completedTasks+'/'+totalTasks+' '+(LANG==='el'?'εργασίες ολοκληρώθηκαν':'tasks complete')+'</div>';
+  if(counts.inprogress > 0) html += '<div style="font-size:11px;color:#f0a830;margin-top:1px">'+counts.inprogress+' '+(LANG==='el'?'ενεργά':'active')+'</div>';
+  html += '</div></div></div>';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Μονάδα':'Unit')+'</div><div class="svalue">'+esc(unit.name)+'</div><div class="ssub">Floor '+unit.floor+' · '+(unit.size_m2||108)+' m²</div></div>';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Πιστοποίηση':'Certification')+'</div><div class="svalue" style="color:#4dba78">LEED</div><div class="ssub">'+(LANG==='el'?'Στόχος Platinum':'Platinum target')+'</div></div>';
   html += '<div class="stat" id="hdStatBlock" style="cursor:pointer" onclick="document.getElementById(\'handoverEdit\').style.display=\'flex\';this.style.display=\'none\'"><div class="slabel">'+(LANG==='el'?'Παράδοση':'Handover')+'</div><div class="svalue" id="hdStatValue">'+esc(hdStat)+'</div><div class="ssub" id="hdYrValue">'+hdYr+'</div></div>';
