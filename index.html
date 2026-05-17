@@ -282,8 +282,12 @@ body.client-mode .notes-section:not(.action-items){display:none!important}
   <div class="editor">
     <h2 id="noteEdTitle">Edit Note</h2>
     <div class="field">
-      <label>Label</label>
+      <label>Label <span style="color:#666;font-weight:400">(EN)</span></label>
       <input id="noteEdLabel" placeholder="e.g. Action Required...">
+    </div>
+    <div class="field">
+      <label>Label <span style="color:#666;font-weight:400">(GR)</span></label>
+      <input id="noteEdLabelEl" placeholder="π.χ. Απαιτείται ενέργεια...">
     </div>
     <div class="field">
       <label>Type</label>
@@ -295,8 +299,12 @@ body.client-mode .notes-section:not(.action-items){display:none!important}
       </select>
     </div>
     <div class="field">
-      <label>Note</label>
+      <label>Note <span style="color:#666;font-weight:400">(EN)</span> <button type="button" onclick="translateField('noteEdText','noteEdTextEl')" style="font-size:10px;background:#2a2a4a;border:1px solid #4a4a6a;color:#5ba3f5;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:6px">🔄 Auto-translate</button></label>
       <textarea id="noteEdText" placeholder="Project note..." rows="4"></textarea>
+    </div>
+    <div class="field">
+      <label>Note <span style="color:#666;font-weight:400">(GR)</span></label>
+      <textarea id="noteEdTextEl" placeholder="Σημείωση έργου..." rows="4"></textarea>
     </div>
     <div class="editor-actions">
       <button class="btn btn-danger" id="noteDeleteBtn" onclick="deleteNote()" style="display:none">Delete</button>
@@ -311,7 +319,7 @@ body.client-mode .notes-section:not(.action-items){display:none!important}
     <h2 id="actEdTitle">Action Item</h2>
     <input type="hidden" id="actEdIdx" value="-1">
     <div class="field">
-      <label>Action <span style="color:#666;font-weight:400">(EN)</span></label>
+      <label>Action <span style="color:#666;font-weight:400">(EN)</span> <button type="button" onclick="translateField('actEdAction','actEdActionEl')" style="font-size:10px;background:#2a2a4a;border:1px solid #4a4a6a;color:#5ba3f5;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:6px">🔄 Auto-translate</button></label>
       <input id="actEdAction" placeholder="e.g. Choose bathroom fixtures">
     </div>
     <div class="field">
@@ -319,7 +327,7 @@ body.client-mode .notes-section:not(.action-items){display:none!important}
       <input id="actEdActionEl" placeholder="π.χ. Επιλογή ειδών υγιεινής">
     </div>
     <div class="field">
-      <label>Blocks <span style="color:#666;font-weight:400">(EN)</span></label>
+      <label>Blocks <span style="color:#666;font-weight:400">(EN)</span> <button type="button" onclick="translateField('actEdBlocks','actEdBlocksEl')" style="font-size:10px;background:#2a2a4a;border:1px solid #4a4a6a;color:#5ba3f5;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:6px">🔄 Auto-translate</button></label>
       <input id="actEdBlocks" placeholder="e.g. Bathroom tiling">
     </div>
     <div class="field">
@@ -331,7 +339,7 @@ body.client-mode .notes-section:not(.action-items){display:none!important}
       <label for="actEdDone" style="margin:0;cursor:pointer">Complete</label>
     </div>
     <div class="field">
-      <label>Done Note <span style="color:#666;font-weight:400">(EN)</span></label>
+      <label>Done Note <span style="color:#666;font-weight:400">(EN)</span> <button type="button" onclick="translateField('actEdDoneNote','actEdDoneNoteEl')" style="font-size:10px;background:#2a2a4a;border:1px solid #4a4a6a;color:#5ba3f5;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:6px">🔄 Auto-translate</button></label>
       <input id="actEdDoneNote" placeholder="e.g. Delivered — ready for installation">
     </div>
     <div class="field">
@@ -517,6 +525,57 @@ function pct(d){return((new Date(d)-TS)/86400000/TD*100).toFixed(2);}
 function fmt(d){return new Date(d).toLocaleDateString(LANG==='el'?'el-GR':'en-GB',{day:'numeric',month:'short'});}
 function todayPct(){return pct(new Date());}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// === AUTO-TRANSLATE ===
+function autoTranslate(text, from, to, callback){
+  if(!text || !text.trim()){ callback(''); return; }
+  var q = encodeURIComponent(text.trim());
+  var url = 'https://api.mymemory.translated.net/get?q='+q+'&langpair='+from+'|'+to;
+  fetch(url).then(r=>r.json()).then(d=>{
+    if(d.responseData && d.responseData.translatedText){
+      var t = d.responseData.translatedText;
+      // MyMemory sometimes returns uppercase when unsure — skip if it looks wrong
+      callback(t !== text.toUpperCase() ? t : '');
+    } else { callback(''); }
+  }).catch(()=>callback(''));
+}
+function detectLang(text){
+  // Simple: if it has Greek characters, it's Greek
+  if(/[\u0370-\u03FF\u1F00-\u1FFF]/.test(text)) return 'el';
+  return 'en';
+}
+
+// Translate button helper — auto-detects source, fills the other field
+function translateField(enId, elId){
+  var enEl = document.getElementById(enId);
+  var elEl = document.getElementById(elId);
+  if(!enEl || !elEl) return;
+  var en = enEl.value.trim();
+  var el = elEl.value.trim();
+  // Figure out which direction
+  if(el && !en){
+    // Greek filled, English empty → translate GR→EN
+    elEl.style.opacity='0.5';
+    autoTranslate(el, 'el', 'en', function(t){
+      if(t) enEl.value = t;
+      elEl.style.opacity='1';
+    });
+  } else if(en && !el){
+    // English filled, Greek empty → translate EN→GR
+    enEl.style.opacity='0.5';
+    autoTranslate(en, 'en', 'el', function(t){
+      if(t) elEl.value = t;
+      enEl.style.opacity='1';
+    });
+  } else if(en && el){
+    // Both filled — detect which changed last? Just translate EN→GR
+    enEl.style.opacity='0.5';
+    autoTranslate(en, 'en', 'el', function(t){
+      if(t) elEl.value = t;
+      enEl.style.opacity='1';
+    });
+  }
+}
 
 // === ICONS FOR TASKS ===
 var TASK_ICONS = {
@@ -1114,12 +1173,25 @@ function openNoteEditor(nk){
     document.getElementById('noteEdLabel').value = meta.label || nk;
     document.getElementById('noteEdType').value = meta.type || 'info';
     document.getElementById('noteEdText').value = unit.notes[nk];
+    // Load Greek
+    var grLabel = '', grText = '';
+    if(unit.noteTranslations && unit.noteTranslations.el && unit.noteTranslations.el[nk]){
+      grLabel = unit.noteTranslations.el[nk].label || '';
+      grText = unit.noteTranslations.el[nk].text || '';
+    } else {
+      grLabel = NOTE_LABELS_EL[nk] || '';
+      grText = NOTE_TEXTS_EL[nk] || '';
+    }
+    document.getElementById('noteEdLabelEl').value = grLabel;
+    document.getElementById('noteEdTextEl').value = grText;
     document.getElementById('noteDeleteBtn').style.display = '';
   } else {
     document.getElementById('noteEdTitle').textContent = 'Add Note';
     document.getElementById('noteEdLabel').value = '';
     document.getElementById('noteEdType').value = 'info';
     document.getElementById('noteEdText').value = '';
+    document.getElementById('noteEdLabelEl').value = '';
+    document.getElementById('noteEdTextEl').value = '';
     document.getElementById('noteDeleteBtn').style.display = 'none';
   }
   document.getElementById('noteOverlay').classList.add('active');
@@ -1130,12 +1202,20 @@ function saveNote(){
   var label = document.getElementById('noteEdLabel').value.trim();
   var text = document.getElementById('noteEdText').value.trim();
   if(!label || !text){ toast('Label and text required', true); return; }
+  var labelEl = document.getElementById('noteEdLabelEl').value.trim();
+  var textEl = document.getElementById('noteEdTextEl').value.trim();
   if(!DATA.units[CURRENT_UNIT].notes) DATA.units[CURRENT_UNIT].notes = {};
   if(!DATA.units[CURRENT_UNIT]._noteMeta) DATA.units[CURRENT_UNIT]._noteMeta = {};
   if(EDITING_NOTE) delete DATA.units[CURRENT_UNIT].notes[EDITING_NOTE];
   var key = label.toLowerCase().replace(/[^a-z0-9]/g,'').substring(0,20) || ('note'+Date.now());
   DATA.units[CURRENT_UNIT].notes[key] = text;
   DATA.units[CURRENT_UNIT]._noteMeta[key] = {label:label,type:document.getElementById('noteEdType').value};
+  // Save Greek translations
+  if(labelEl || textEl){
+    if(!DATA.units[CURRENT_UNIT].noteTranslations) DATA.units[CURRENT_UNIT].noteTranslations = {};
+    if(!DATA.units[CURRENT_UNIT].noteTranslations.el) DATA.units[CURRENT_UNIT].noteTranslations.el = {};
+    DATA.units[CURRENT_UNIT].noteTranslations.el[key] = {label:labelEl,text:textEl};
+  }
   closeNoteEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Note saved');
 }
 function deleteNote(){
