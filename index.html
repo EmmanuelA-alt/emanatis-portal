@@ -863,8 +863,10 @@ function renderUnit(uid){
     var nLabel = (noteMeta[nk]&&noteMeta[nk].label) || nk;
     var nText = notes[nk];
     if(LANG==='el'){
-      nLabel = NOTE_LABELS_EL[nk] || nLabel;
-      nText = NOTE_TEXTS_EL[nk] || nText;
+      // Check noteTranslations in data first, then fall back to hardcoded
+      var ntEl = (unit.noteTranslations && unit.noteTranslations.el && unit.noteTranslations.el[nk]);
+      if(ntEl){ nLabel = ntEl.label || nLabel; nText = ntEl.text || nText; }
+      else { nLabel = NOTE_LABELS_EL[nk] || nLabel; nText = NOTE_TEXTS_EL[nk] || nText; }
     }
     html += '<div class="note-card" data-notekey="'+esc(nk)+'" onclick="openNoteEditor(\''+esc(nk)+'\')"><div class="note-tag '+nType+'">'+esc(nLabel)+'</div><p>'+esc(nText)+'</p></div>';
   });
@@ -873,11 +875,28 @@ function renderUnit(uid){
 
   html += '</div>';
 
+  // Save scroll positions before re-render
+  var _savedScrollX = 0, _savedScrollY = 0, _shouldRestoreScroll = false;
+  var _wrap = document.querySelector('.gantt-wrap');
+  var _app = document.getElementById('app');
+  if(_wrap){ _savedScrollX = _wrap.scrollLeft; _shouldRestoreScroll = true; }
+  if(_app && _app.parentElement){ _savedScrollY = window.pageYOffset || document.documentElement.scrollTop; }
+
   document.getElementById('app').innerHTML = html;
   document.getElementById('navBar').style.display = 'flex';
   updateNavRange();
   updateLastUpdated();
-  setTimeout(scrollToToday, 100);
+
+  // Restore scroll positions instead of jumping to today
+  if(_shouldRestoreScroll){
+    requestAnimationFrame(function(){
+      var newWrap = document.querySelector('.gantt-wrap');
+      if(newWrap) newWrap.scrollLeft = _savedScrollX;
+      window.scrollTo(0, _savedScrollY);
+    });
+  } else {
+    setTimeout(scrollToToday, 100);
+  }
   enableDragScroll();
   enableBarDrag();
   enableBarMenus();
