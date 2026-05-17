@@ -3126,8 +3126,8 @@
       "size_m2": 108,
       "client": "Fatouros / Diakatou",
       "token": "3ik6SIixCFPMviVBDwXvoJJfT7l9Dccd",
-      "handover": "15 Aug 2026",
-      "handoverDate": "2026-08-15",
+      "handover": "30 Sept 2026",
+      "handoverDate": "2026-09-30",
       "notes": {
         "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
@@ -3139,15 +3139,25 @@
       "tasks": {
         "t1": {
           "st": "complete",
-          "s": "2026-02-18",
+          "s": "2026-01-01",
           "e": "2026-02-27",
           "nt": "Concrete, masonry, openings"
         },
         "t2": {
           "st": "pending",
           "s": "2026-06-30",
-          "e": "2026-08-06",
-          "nt": "Exterior + balcony + wet areas"
+          "e": "2026-08-01",
+          "nt": "Exterior + balcony + wet areas",
+          "segments": [
+            {
+              "s": "2026-06-30",
+              "e": "2026-08-01"
+            },
+            {
+              "s": "2026-09-01",
+              "e": "2026-09-30"
+            }
+          ]
         },
         "t16": {
           "st": "pending",
@@ -3525,7 +3535,7 @@
           }
         }
       },
-      "clientEmail": "afatouros@solcrowe.gr"
+      "phone": "6945802576"
     },
     "p": {
       "name": "Aetheria",
