@@ -808,8 +808,9 @@ function renderUnit(uid){
       else progPct = Math.round((tNow - tStart) / (tEnd - tStart) * 100);
       if(st === 'critical') progColor = 'red';
       else if(st === 'blocked') progColor = 'red';
-      else if(st === 'inprogress') progColor = 'amber';
+      else if(st === 'inprogress') progColor = progPct >= 100 ? 'green' : 'amber';
       else if(st === 'ordered') progColor = 'blue';
+      else if(st === 'pending') progColor = progPct >= 100 ? 'green' : 'gray';
       else progColor = 'gray';
     }
     html += '<div><div class="task-name">'+esc(taskName)+'</div><div class="task-note">'+esc(taskNote)+'</div>';
