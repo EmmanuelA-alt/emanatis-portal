@@ -55,6 +55,16 @@
       "cat": 0
     },
     {
+      "id": "balfloor",
+      "nm": "Balcony Flooring",
+      "cat": 0
+    },
+    {
+      "id": "pergola",
+      "nm": "Pergola Installation",
+      "cat": 0
+    },
+    {
       "id": "t16",
       "nm": "Balcony Railings & Glazing",
       "cat": 0
@@ -123,6 +133,11 @@
     {
       "id": "t14",
       "nm": "Interior Painting",
+      "cat": 2
+    },
+    {
+      "id": "jacuzzi",
+      "nm": "Jacuzzi Installation",
       "cat": 2
     },
     {
@@ -3308,6 +3323,24 @@
           "s": "2026-08-16",
           "e": "2026-10-30",
           "nt": "Phased May-July"
+        },
+        "balfloor": {
+          "st": "pending",
+          "s": "2026-07-06",
+          "e": "2026-07-16",
+          "nt": "Exterior-grade tile/decking — must complete before pergola and Jacuzzi"
+        },
+        "pergola": {
+          "st": "pending",
+          "s": "2026-07-16",
+          "e": "2026-07-25",
+          "nt": "After balcony flooring — before railings close out"
+        },
+        "jacuzzi": {
+          "st": "pending",
+          "s": "2026-07-25",
+          "e": "2026-08-01",
+          "nt": "On balcony — requires flooring + pergola first. Plumbing from t10."
         }
       },
       "translations": {
