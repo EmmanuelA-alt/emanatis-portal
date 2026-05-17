@@ -186,6 +186,7 @@ body.client-mode .client-info input{background:transparent!important;border:none
 body.client-mode .client-info input:focus{outline:none!important}
 body.client-mode .notes-section h3 button{display:none!important}
 body.client-mode .notes-section.action-items{display:block!important}
+body.client-mode .notes-section.action-items .btn{display:none!important}
 body.client-mode .notes-section:not(.action-items){display:none!important}
 /* Responsive */
 @media(max-width:900px){
@@ -301,6 +302,46 @@ body.client-mode .notes-section:not(.action-items){display:none!important}
       <button class="btn btn-danger" id="noteDeleteBtn" onclick="deleteNote()" style="display:none">Delete</button>
       <button class="btn btn-primary" onclick="closeNoteEditor()">Cancel</button>
       <button class="btn btn-save" onclick="saveNote()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="editor-overlay" id="actOverlay">
+  <div class="editor" style="max-width:480px">
+    <h2 id="actEdTitle">Action Item</h2>
+    <input type="hidden" id="actEdIdx" value="-1">
+    <div class="field">
+      <label>Action <span style="color:#666;font-weight:400">(EN)</span></label>
+      <input id="actEdAction" placeholder="e.g. Choose bathroom fixtures">
+    </div>
+    <div class="field">
+      <label>Action <span style="color:#666;font-weight:400">(GR)</span></label>
+      <input id="actEdActionEl" placeholder="π.χ. Επιλογή ειδών υγιεινής">
+    </div>
+    <div class="field">
+      <label>Blocks <span style="color:#666;font-weight:400">(EN)</span></label>
+      <input id="actEdBlocks" placeholder="e.g. Bathroom tiling">
+    </div>
+    <div class="field">
+      <label>Blocks <span style="color:#666;font-weight:400">(GR)</span></label>
+      <input id="actEdBlocksEl" placeholder="π.χ. Τοποθέτηση πλακετών">
+    </div>
+    <div class="field" style="display:flex;align-items:center;gap:10px">
+      <input type="checkbox" id="actEdDone" style="width:18px;height:18px">
+      <label for="actEdDone" style="margin:0;cursor:pointer">Complete</label>
+    </div>
+    <div class="field">
+      <label>Done Note <span style="color:#666;font-weight:400">(EN)</span></label>
+      <input id="actEdDoneNote" placeholder="e.g. Delivered — ready for installation">
+    </div>
+    <div class="field">
+      <label>Done Note <span style="color:#666;font-weight:400">(GR)</span></label>
+      <input id="actEdDoneNoteEl" placeholder="π.χ. Παραληφθέν — έτοιμο για εγκατάσταση">
+    </div>
+    <div class="editor-actions">
+      <button class="btn btn-danger" id="actDeleteBtn" onclick="deleteClientAction()">Delete</button>
+      <button class="btn btn-primary" onclick="closeActEditor()">Cancel</button>
+      <button class="btn btn-save" onclick="saveClientAction()">Save</button>
     </div>
   </div>
 </div>
@@ -951,13 +992,13 @@ function renderUnit(uid){
       var bText = (LANG==='el' && a.blocks_el) ? a.blocks_el : a.blocks;
       if(a.done){
         var dNote = (LANG==='el' && a.done_note_el) ? a.done_note_el : (a.done_note || '');
-        html += '<div style="background:#0d2018;border:1px solid #2d8a52;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;opacity:0.7">';
+        html += '<div style="background:#0d2018;border:1px solid #2d8a52;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;opacity:0.7" onclick="editClientAction('+idx+')" title="Click to edit">';
         html += '<div style="color:#4dba78;font-size:18px;margin-top:2px">✅</div>';
         html += '<div><div style="font-size:13px;font-weight:600;color:#4dba78;text-decoration:line-through;text-decoration-color:#4dba78">'+esc(aText)+'</div>';
         if(dNote) html += '<div style="font-size:11px;color:#4dba78;margin-top:4px">'+esc(dNote)+'</div>';
         html += '</div></div>';
       } else {
-        html += '<div style="background:#1a1a24;border:1px solid #8a2040;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color 0.15s" onclick="toggleClientAction('+idx+')" title="Click to mark complete">';
+        html += '<div style="background:#1a1a24;border:1px solid #8a2040;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color 0.15s" onclick="editClientAction('+idx+')" title="Click to edit">';
         html += '<div style="color:#f05070;font-size:18px;margin-top:2px">☐</div>';
         html += '<div><div style="font-size:13px;font-weight:600;color:#f05070">'+esc(aText)+'</div>';
         html += '<div style="font-size:11px;color:#888;margin-top:4px">'+(LANG==='el'?'Εμποδίζει: ':'Blocks: ')+esc(bText)+'</div>';
@@ -1105,31 +1146,68 @@ function deleteNote(){
 }
 
 // === CLIENT ACTIONS ===
-function toggleClientAction(idx){
+function editClientAction(idx){
   if(!CURRENT_UNIT) return;
   var actions = DATA.units[CURRENT_UNIT].clientActions;
-  if(!actions || !actions[idx]) return;
-  actions[idx].done = !actions[idx].done;
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  toast(actions[idx].done ? '✓ Marked complete' : '☐ Marked pending');
+  if(!actions || actions[idx] === undefined) return;
+  var a = actions[idx];
+  document.getElementById('actEdIdx').value = idx;
+  document.getElementById('actEdAction').value = a.action || '';
+  document.getElementById('actEdBlocks').value = a.blocks || '';
+  document.getElementById('actEdDone').checked = a.done || false;
+  document.getElementById('actEdActionEl').value = a.action_el || '';
+  document.getElementById('actEdBlocksEl').value = a.blocks_el || '';
+  document.getElementById('actEdDoneNote').value = a.done_note || '';
+  document.getElementById('actEdDoneNoteEl').value = a.done_note_el || '';
+  document.getElementById('actDeleteBtn').style.display = '';
+  document.getElementById('actOverlay').classList.add('active');
 }
-function addClientAction(){
+function openNewAction(){
   if(!CURRENT_UNIT || window.IS_READONLY) return;
-  var action = prompt('New action item:');
-  if(!action || !action.trim()) return;
-  var blocks = prompt('What does this block?') || '';
-  if(!DATA.units[CURRENT_UNIT].clientActions) DATA.units[CURRENT_UNIT].clientActions = [];
-  DATA.units[CURRENT_UNIT].clientActions.push({
-    id: 'act_'+Date.now(),
-    action: action.trim(),
-    blocks: blocks.trim(),
-    done: false
-  });
-  renderUnit(CURRENT_UNIT);
-  autoSave();
-  toast('Action item added');
+  document.getElementById('actEdIdx').value = '-1';
+  document.getElementById('actEdAction').value = '';
+  document.getElementById('actEdBlocks').value = '';
+  document.getElementById('actEdDone').checked = false;
+  document.getElementById('actEdActionEl').value = '';
+  document.getElementById('actEdBlocksEl').value = '';
+  document.getElementById('actEdDoneNote').value = '';
+  document.getElementById('actEdDoneNoteEl').value = '';
+  document.getElementById('actDeleteBtn').style.display = 'none';
+  document.getElementById('actOverlay').classList.add('active');
 }
+function closeActEditor(){ document.getElementById('actOverlay').classList.remove('active'); }
+function saveClientAction(){
+  if(!CURRENT_UNIT) return;
+  var idx = parseInt(document.getElementById('actEdIdx').value);
+  var action = document.getElementById('actEdAction').value.trim();
+  if(!action){ toast('Action required', true); return; }
+  var obj = {
+    id: 'act_'+Date.now(),
+    action: action,
+    blocks: document.getElementById('actEdBlocks').value.trim(),
+    done: document.getElementById('actEdDone').checked,
+    action_el: document.getElementById('actEdActionEl').value.trim(),
+    blocks_el: document.getElementById('actEdBlocksEl').value.trim(),
+    done_note: document.getElementById('actEdDoneNote').value.trim(),
+    done_note_el: document.getElementById('actEdDoneNoteEl').value.trim()
+  };
+  if(!DATA.units[CURRENT_UNIT].clientActions) DATA.units[CURRENT_UNIT].clientActions = [];
+  if(idx >= 0){
+    obj.id = DATA.units[CURRENT_UNIT].clientActions[idx].id || obj.id;
+    DATA.units[CURRENT_UNIT].clientActions[idx] = obj;
+  } else {
+    DATA.units[CURRENT_UNIT].clientActions.push(obj);
+  }
+  closeActEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast(idx >= 0 ? 'Updated' : 'Added');
+}
+function deleteClientAction(){
+  if(!CURRENT_UNIT) return;
+  var idx = parseInt(document.getElementById('actEdIdx').value);
+  if(idx < 0) return;
+  DATA.units[CURRENT_UNIT].clientActions.splice(idx, 1);
+  closeActEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Deleted');
+}
+function addClientAction(){ openNewAction(); }
 
 // === REQUEST UPDATE ===
 function requestUpdate(){
