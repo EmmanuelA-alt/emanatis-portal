@@ -3189,8 +3189,22 @@
         "hvac": {
           "st": "inprogress",
           "s": "2026-02-17",
-          "e": "2026-05-17",
-          "nt": "UFH, heat pump, FCUs - unblocks flooring"
+          "e": "2026-03-29",
+          "nt": "UFH, heat pump, FCUs - unblocks flooring",
+          "segments": [
+            {
+              "s": "2026-02-17",
+              "e": "2026-03-29"
+            },
+            {
+              "s": "2026-05-19",
+              "e": "2026-05-26"
+            },
+            {
+              "s": "2026-06-06",
+              "e": "2026-07-03"
+            }
+          ]
         },
         "hrv": {
           "st": "inprogress",
