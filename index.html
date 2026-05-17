@@ -825,7 +825,10 @@ function renderUnit(uid){
   html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Email':'Email')+'</div><input value="'+esc(unit.email||'')+'" onchange="DATA.units[CURRENT_UNIT].email=this.value;autoSave()" placeholder="'+(LANG==='el'?'Email':'email')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
   html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Τηλέφωνο':'Phone')+'</div><input value="'+esc(unit.phone||'')+'" onchange="DATA.units[CURRENT_UNIT].phone=this.value;autoSave()" placeholder="'+(LANG==='el'?'Τηλέφωνο':'phone')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
   html += '</div>';
-  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Σημειώσεις':'Notes')+'</div><input value="'+esc(unit.clientNotes||'')+'" onchange="DATA.units[CURRENT_UNIT].clientNotes=this.value;autoSave()" placeholder="'+(LANG==='el'?'Σημειώσεις':'notes')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
+  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Σημειώσεις (GR)':'Notes (EN)')+' <button type="button" onclick="translateClientNotes()" style="font-size:10px;background:#2a2a4a;border:1px solid #4a4a6a;color:#5ba3f5;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:6px">🔄</button></div><input id="clientNotesEn" value="'+esc(unit.clientNotes||'')+'" onchange="DATA.units[CURRENT_UNIT].clientNotes=this.value;autoSave()" placeholder="'+(LANG==='el'?'Σημειώσεις':'Notes')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '<div><div class="slabel" style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">'+(LANG==='el'?'Σημειώσεις (EN)':'Notes (GR)')+'</div><input id="clientNotesEl" value="'+esc(unit.clientNotesEl||'')+'" onchange="DATA.units[CURRENT_UNIT].clientNotesEl=this.value;autoSave()" placeholder="'+(LANG==='el'?'Σημειώσεις (αγγλικά)':'Notes (Greek)')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:8px 12px;border-radius:8px;font-size:14px;width:100%;box-sizing:border-box"></div>';
+  html += '</div>';
   html += '</div>';
 
   // Save Button
@@ -1288,6 +1291,20 @@ function deleteClientAction(){
   closeActEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Deleted');
 }
 function addClientAction(){ openNewAction(); }
+
+function translateClientNotes(){
+  var enEl = document.getElementById('clientNotesEn');
+  var elEl = document.getElementById('clientNotesEl');
+  if(!enEl || !elEl) return;
+  var en = enEl.value.trim(), el = elEl.value.trim();
+  if(el && !en){
+    elEl.style.opacity='0.5'; autoTranslate(el,'el','en',function(t){ if(t) enEl.value=t; elEl.style.opacity='1'; });
+  } else if(en && !el){
+    enEl.style.opacity='0.5'; autoTranslate(en,'en','el',function(t){ if(t) elEl.value=t; enEl.style.opacity='1'; });
+  } else if(en){
+    enEl.style.opacity='0.5'; autoTranslate(en,'en','el',function(t){ if(t) elEl.value=t; enEl.style.opacity='1'; });
+  }
+}
 
 // === REQUEST UPDATE ===
 function requestUpdate(){
