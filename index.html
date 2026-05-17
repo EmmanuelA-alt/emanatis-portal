@@ -998,14 +998,6 @@ function renderUnit(uid){
   });
   html += '</div></div>';
 
-  // Handover — editable
-  var hd = unit.handoverDate ? fmt(unit.handoverDate) : (unit.handover || 'TBD');
-  html += '<div class="handover-panel"><div><h3>'+(LANG==='el'?'Παράδοση Κλειδιών':'Key Handover')+' — '+esc(unit.name)+'</h3><p>'+(LANG==='el'?'Επαγγελματικός καθαρισμός · Έξυπνο σπίτι · Πλήρης έλεγχος':'Professional cleaning · Smart home configured · All systems commissioned')+'</p></div>';
-  html += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">';
-  html += '<div class="hdate" id="handoverDisplay" style="cursor:pointer;border-bottom:1px dashed #4dba78;font-size:22px;font-weight:700;color:#fff" title="Click to edit" onclick="editHandover()">'+esc(hd)+'</div>';
-  html += '<input type="date" id="handoverDateInput" value="'+(unit.handoverDate||'')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 10px;border-radius:6px;font-size:13px;display:none" onchange="saveHandover(this.value)">';
-  html += '</div></div>';
-
   // Request Update button + Contact + Last Updated (visible in all modes)
   html += '<div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">';
 
