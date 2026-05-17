@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galatsi Residence — Internal Construction Management</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f13;color:#e8e8e8;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+/* Header */
+header{background:#16161d;border-bottom:1px solid #2a2a3a;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;flex-shrink:0}
+header h1{font-size:18px;font-weight:600;color:#fff}
+.sub{font-size:12px;color:#888;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{background:#1e3a5f;color:#5ba3f5;font-size:11px;padding:4px 12px;border-radius:16px;border:1px solid #2a5080}
+select{background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 12px;border-radius:6px;font-size:13px;cursor:pointer}
+select:focus{outline:1px solid #5ba3f5}
+.btn{padding:6px 14px;border-radius:6px;border:1px solid;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.2s}
+.btn-primary{background:#1e3a5f;color:#5ba3f5;border-color:#2a5080}
+.btn-primary:hover{background:#2a5080}
+.btn-save{background:#1a4a2e;color:#4dba78;border-color:#2d8a52}
+.btn-save:hover{background:#22663d}
+.btn-danger{background:#3a1020;color:#f05070;border-color:#8a2040}
+.btn-danger:hover{background:#5a1830}
+.btn-sm{padding:4px 10px;font-size:11px}
+.lang-btn{background:#1e1e2e;border:1px solid #3a3a5a;color:#aaa;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.2s}
+.lang-btn:hover{background:#2a2a4a;color:#fff}
+/* Split Pane */
+.split-container{flex:1;display:flex;overflow:hidden;position:relative}
+.left-pane{width:40%;min-width:300px;max-width:60%;display:flex;flex-direction:column;background:#0f0f13;border-right:2px solid #2a2a3a}
+.right-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.divider{width:6px;background:#1a1a24;cursor:col-resize;position:relative;z-index:10;flex-shrink:0;border-left:1px solid #2a2a3a;border-right:1px solid #2a2a3a;transition:background 0.15s}
+.divider:hover,.divider.active{background:#2a5080}
+.divider::after{content:'⋮';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#3a3a5a;font-size:14px}
+/* Task Table */
+.table-header{background:#1a1a24;border-bottom:1px solid #2a2a3a;display:flex;align-items:center;padding:0;flex-shrink:0;font-size:10px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1px}
+.th{padding:10px 8px;border-right:1px solid #1e1e28;overflow:hidden;white-space:nowrap}
+.th-name{flex:2;min-width:140px}.th-status{width:80px}.th-start{width:100px}.th-end{width:100px}.th-note{flex:1.5;min-width:100px}.th-actions{width:70px;border-right:none}
+.table-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.task-section{background:#08080e;padding:8px 10px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#5ba3f5;border-bottom:2px solid #1e3a5f;border-top:3px solid #2a2a3a;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.task-section:hover{background:#0c0c14}
+.task-row{display:flex;align-items:center;border-bottom:1px solid #1e1e28;min-height:38px;transition:background 0.1s;cursor:default;border-left:3px solid transparent}
+.task-row.st-complete{border-left-color:#2d8a52}
+.task-row.st-inprogress{border-left-color:#8a6420}
+.task-row.st-critical{border-left-color:#8a2040}
+.task-row.st-blocked{border-left-color:#8a5020}
+.task-row.st-pending{border-left-color:#353560}
+.task-row.st-ordered{border-left-color:#1d7a44}
+.task-row:hover{background:#1c1c26}
+.task-row.drag-over{border-top:2px solid #5ba3f5}
+.td{padding:4px 8px;border-right:1px solid #1e1e28;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.td-name{flex:2;min-width:140px;display:flex;align-items:center;gap:6px}.td-status{width:80px}.td-start{width:100px}.td-end{width:100px}.td-note{flex:1.5;min-width:100px}.td-actions{width:70px;border-right:none;display:flex;gap:2px;align-items:center}
+.task-icon{font-size:14px;flex-shrink:0}
+.task-name-text{font-weight:500;color:#ccc;cursor:text}
+.task-row.st-complete .task-name-text{color:#6a6a6a}
+.task-row.st-complete .task-name-text::after{content:' ✓';color:#4dba78;font-size:11px}
+/* Status badges */
+.status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;user-select:none;transition:all 0.15s}
+.status-badge:hover{filter:brightness(1.2)}
+.status-badge.complete{background:#1a4a2e;color:#4dba78;border:1px solid #2d8a52}
+.status-badge.inprogress{background:#3a2a10;color:#f0a830;border:1px solid #8a6420}
+.status-badge.pending{background:#1a1a3a;color:#7878c0;border:1px solid #353560}
+.status-badge.critical{background:#3a1020;color:#f05070;border:1px solid #8a2040}
+.status-badge.blocked{background:#3a2010;color:#f08030;border:1px solid #8a5020}
+.status-badge.ordered{background:#0d3320;color:#3ddc6e;border:1px solid #1d7a44}
+/* Inline editing */
+.inline-edit{background:#1e1e2e;border:1px solid #5ba3f5;color:#e8e8e8;padding:2px 6px;border-radius:4px;font-size:12px;font-family:inherit;width:100%;outline:none}
+.inline-edit-date{width:90px}
+/* Shared systems section */
+.shared-section{background:#0d1520;border:1px solid #1d3a5f;border-radius:8px;margin:8px;padding:12px}
+.shared-title{font-size:10px;font-weight:700;color:#5ba3f5;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+/* Gantt Right Pane */
+.gantt-toolbar{background:#1a1a24;border-bottom:1px solid #2a2a3a;padding:6px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.gantt-wrap{flex:1;overflow:auto;position:relative;background:#0f0f13}
+.gantt-inner{min-width:4000px;position:relative}
+.gantt-header-row{display:flex;background:#1a1a24;border-bottom:1px solid #2a2a3a;position:sticky;top:0;z-index:12;height:36px}
+.gh-label{min-width:1px;width:1px;flex-shrink:0}
+.gh-months{flex:1;position:relative;height:36px}
+.gh-month{position:absolute;top:0;height:36px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#5ba3f5;letter-spacing:1px;text-transform:uppercase;border-right:1px solid #2a2a3a;background:#1a1a24}
+/* Gantt rows */
+.g-section-hdr{background:#08080e;padding:8px 12px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#5ba3f5;border-bottom:1px solid #1e3a5f;border-top:2px solid #2a2a3a}
+.g-task-row{position:relative;height:38px;border-bottom:1px solid #1e1e28;transition:background 0.1s;border-left:3px solid transparent}
+.g-task-row.st-complete{border-left-color:#2d8a52}
+.g-task-row.st-inprogress{border-left-color:#8a6420}
+.g-task-row.st-critical{border-left-color:#8a2040}
+.g-task-row.st-blocked{border-left-color:#8a5020}
+.g-task-row.st-pending{border-left-color:#353560}
+.g-task-row.st-ordered{border-left-color:#1d7a44}
+.g-task-row:hover{background:#1c1c26}
+.month-grid-line{position:absolute;top:0;bottom:0;width:1px;background:#1e1e28;z-index:1}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:#f05070;z-index:5;opacity:0.7}
+/* Gantt bars */
+.bar{height:24px;border-radius:5px;position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;padding:0 6px;font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;cursor:pointer;transition:filter 0.15s;min-width:4px;z-index:3}
+.bar:hover{filter:brightness(1.2);box-shadow:0 0 8px rgba(255,255,255,0.1)}
+.bar.complete{background:linear-gradient(90deg,#1a4a2e,#22663d);border:1px solid #2d8a52;color:#4dba78}
+.bar.inprogress{background:linear-gradient(90deg,#3a2a10,#5a4010);border:1px solid #8a6420;color:#f0a830}
+.bar.pending{background:linear-gradient(90deg,#1a1a3a,#252545);border:1px solid #353560;color:#7878c0}
+.bar.critical{background:linear-gradient(90deg,#3a1020,#5a1830);border:1px solid #8a2040;color:#f05070}
+.bar.blocked{background:linear-gradient(90deg,#3a2010,#5a3010);border:1px solid #8a5020;color:#f08030}
+.bar.ordered{background:linear-gradient(90deg,#0d3320,#14512e);border:1px solid #1d7a44;color:#3ddc6e}
+/* Milestone diamonds */
+.milestone{position:absolute;top:50%;transform:translate(-50%,-50%) rotate(45deg);width:14px;height:14px;border:2px solid;z-index:4;cursor:pointer}
+.milestone.complete{background:#4dba78;border-color:#2d8a52}
+.milestone.pending{background:#5ba3f5;border-color:#2a5080}
+.milestone.critical{background:#f05070;border-color:#8a2040}
+.milestone:hover{filter:brightness(1.3);box-shadow:0 0 8px rgba(255,255,255,0.2)}
+.milestone-tooltip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1e1e2e;border:1px solid #3a3a5a;border-radius:6px;padding:6px 10px;font-size:11px;color:#ccc;white-space:nowrap;z-index:20;pointer-events:none;margin-bottom:8px}
+.milestone:hover .milestone-tooltip{display:block}
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#1a4a2e;color:#4dba78;padding:12px 20px;border-radius:8px;border:1px solid #2d8a52;font-size:13px;font-weight:600;z-index:100;transform:translateY(80px);opacity:0;transition:all 0.3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.error{background:#3a1020;color:#f05070;border-color:#8a2040}
+/* Delete confirm */
+.confirm-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:50;justify-content:center;align-items:center}
+.confirm-overlay.active{display:flex}
+.confirm-box{background:#16161d;border:1px solid #3a3a5a;border-radius:12px;padding:24px;width:360px;text-align:center}
+.confirm-box h3{font-size:16px;color:#fff;margin-bottom:8px}
+.confirm-box p{font-size:13px;color:#888;margin-bottom:20px}
+.confirm-box .actions{display:flex;gap:10px;justify-content:center}
+/* Print styles */
+@media print{
+  body{overflow:visible;height:auto}
+  .split-container{display:block;overflow:visible}
+  .left-pane{width:100%!important;max-width:100%!important;border-right:none}
+  .right-pane{display:block;overflow:visible}
+  .divider{display:none}
+  header,.gantt-toolbar,.btn,.confirm-overlay{display:none!important}
+  .gantt-wrap{overflow:visible}
+  .gantt-inner{min-width:auto}
+  .table-scroll{overflow:visible}
+  .task-section,.g-section-hdr{break-inside:avoid}
+}
+/* Scrollbar */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:#0f0f13}
+::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#3a3a5a}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="hTitle">Galatsi Residence — Internal Tool</h1>
+    <div class="sub" id="hSub">Ipeirou 22, Galatsi · LEED Platinum · Construction Management</div>
+  </div>
+  <div class="header-right">
+    <select id="unitSelect"><option value="">— Select Unit —</option></select>
+    <button class="btn btn-primary btn-sm" onclick="addNewTask()" title="Add Task">+ Task</button>
+    <button class="btn btn-save btn-sm" onclick="saveData()" title="Save to GitHub">💾 Save</button>
+    <button class="btn btn-primary btn-sm" onclick="exportPDF()" title="Export PDF">🖨 PDF</button>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">GR Ελληνικά</button>
+  </div>
+</header>
+
+<div class="split-container" id="splitContainer">
+  <!-- Left: Task Table -->
+  <div class="left-pane" id="leftPane">
+    <div class="table-header">
+      <div class="th th-name">Task</div>
+      <div class="th th-status">Status</div>
+      <div class="th th-start">Start</div>
+      <div class="th th-end">End</div>
+      <div class="th th-note">Note</div>
+      <div class="th th-actions"></div>
+    </div>
+    <div class="table-scroll" id="tableScroll"></div>
+  </div>
+
+  <!-- Resizable Divider -->
+  <div class="divider" id="divider"></div>
+
+  <!-- Right: Gantt Timeline -->
+  <div class="right-pane">
+    <div class="gantt-toolbar">
+      <button class="btn btn-primary btn-sm" onclick="scrollGantt(-1)">◂</button>
+      <button class="btn btn-primary btn-sm" onclick="scrollToToday()">● Today</button>
+      <button class="btn btn-primary btn-sm" onclick="scrollGantt(1)">▸</button>
+      <span id="navRange" style="font-size:11px;color:#666;margin-left:auto"></span>
+    </div>
+    <div class="gantt-wrap" id="ganttWrap">
+      <div class="gantt-inner" id="ganttInner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>Delete Task?</h3>
+    <p id="confirmText">This cannot be undone.</p>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="cancelDelete()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// === CONFIG ===
+var DATA = null;
+var CURRENT_UNIT = null;
+var LANG = 'en';
+var GH_REPO = 'EmmanuelA-alt/emanatis-portal';
+var GH_DATA_PATH = 'units.json';
+var DATA_URL = 'units.json';
+var DATA_KEY = 'galatsi-internal-data';
+var DELETE_TARGET = null;
+
+// Timeline range
+var TS, TE, TD, MONTHS = [];
+
+// Status cycle order
+var STATUS_CYCLE = ['pending','inprogress','critical','blocked','ordered','complete'];
+
+// Milestone config — tasks that show as diamonds on timeline
+var MILESTONE_TASKS = ['t23','t24','t22']; // inspections, clean/test, LEED
+
+// === TRANSLATIONS ===
+var TASK_NAMES_EL = {
+  't1':'Φέρων Οργανισμός / Κέλυφος','t2':'Υδατοστεγάνωση & Μόνωση','t16':'Κάγκελα Μπαλκονιού & Τζάμι',
+  't15':'Εξωτερική Πρόσοψη / Βαφή','hvac':'Κλιματισμός / Multi-Floor','hrv':'Σύστημα HRV Ανάκτησης Ενέργειας',
+  't10':'Υδραυλικά - Τελικές Συνδέσεις','t11':'Ηλεκτρολογικά - Τελικό 50%','t19':'Συστήματα Πυρασφάλειας',
+  't20':'Ασφάλεια / Θυροτηλέφωνο / Έξυπνο Σπίτι','t6':'Γυψοσανίδα - Κλείσιμο 2ης Παρειάς',
+  't7':'Δάπεδα','t8':'Κουζίνα & Πάγκοι','t9':'Είδη Υγιεινής & Αξεσουάρ','t14':'Εσωτερική Βαφή',
+  't4':'Εξωτερικές Πόρτες','t5':'Εσωτερικές Πόρτες','t3':'Κουφώματα & Εξωτερικό Υαλοστάσιο',
+  't13':'Ανελκυστήρας - Kleeman','t18':'Πάρκινγκ / Υπόγειο / Φόρτιση EV','t17':'Κοινόχρηστοι Χώροι',
+  'pv':'Φωτοβολταϊκά & Μπαταρία','pent':'7ος Όροφος / Penthouse','t24':'Βαθύς Καθαρισμός & Δοκιμή',
+  't23':'Τελικοί Έλεγχοι & Άδειες','t22':'Υποβολή LEED Platinum','t21':'Εξωτερικός Φωτισμός & Περιβάλλον'
+};
+
+var SECTION_NAMES_EL = {
+  'Structure & Envelope':'Δομή & Κέλυφος',
+  'MEP - Mechanical, Electrical, Plumbing':'ΜΗΧ - Μηχανολογικά, Ηλεκτρολογικά, Υδραυλικά',
+  'Interior Finishes':'Εσωτερικές Φινιρίσεις',
+  'Doors, Windows & Openings':'Πόρτες, Κουφώματα & Ανοίγματα',
+  'Building-Wide Systems':'Συστήματα Κτιρίου',
+  'Handover Sequence':'Ακολουθία Παράδοσης',
+  'Building Shared Systems':'Κοινόχρηστα Συστήματα Κτιρίου'
+};
+
+var SHARED_NAMES_EL = {
+  'elevator':'Ανελκυστήρας (Kleeman)','pv_battery':'Φωτοβολταϊκά & Μπαταρία','common_areas':'Κοινόχρηστοι Χώροι',
+  'facade':'Πρόσοψη','exterior_lighting':'Εξωτερικός Φωτισμός'
+};
+
+var STATUS_LABELS = {
+  pending:{en:'Pending',el:'Εκκρεμεί'},inprogress:{en:'In Progress',el:'Σε Εξέλιξη'},
+  critical:{en:'Critical',el:'Κρίσιμο'},blocked:{en:'Blocked',el:'Αποκλεισμένο'},
+  ordered:{en:'Ordered',el:'Παραγγελμένο'},complete:{en:'Complete',el:'Ολοκληρώθηκε'}
+};
+
+var TASK_ICONS = {
+  t1:'🏗️',t2:'🛡️',t16:'🔩',t15:'🎨',hvac:'♨️',hrv:'💨',t10:'🔧',t11:'⚡',t19:'🚒',t20:'🔐',
+  t6:'🧱',t7:'🪵',t8:'🍳',t9:'🚿',t14:'🖌️',t4:'🚪',t5:'🚪',t3:'🪟',
+  t13:'🛗',t18:'🚗',t17:'🏢',pv:'☀️',pent:'🏗️',t24:'🧹',t23:'📋',t22:'🌿',t21:'💡',
+  elevator:'🛗',pv_battery:'☀️',common_areas:'🏢',facade:'🎨',exterior_lighting:'💡'
+};
+
+// === HELPERS ===
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmt(d){return new Date(d).toLocaleDateString(LANG==='el'?'el-GR':'en-GB',{day:'numeric',month:'short'});}
+function lft(d){return(((new Date(d)-TS)/86400000)/TD*100).toFixed(2)+'%';}
+function wid(s,e){return(((new Date(e)-new Date(s))/86400000)/TD*100).toFixed(2)+'%';}
+function pct(d){return((new Date(d)-TS)/86400000/TD*100).toFixed(2);}
+function todayPct(){return pct(new Date());}
+
+function computeTimelineRange(){
+  var earliest=new Date('2026-01-01'),latest=new Date('2026-12-31');
+  if(DATA&&DATA.units){
+    Object.keys(DATA.units).forEach(uid=>{
+      var u=DATA.units[uid]; if(!u||!u.tasks) return;
+      Object.keys(u.tasks).forEach(tid=>{
+        var t=u.tasks[tid];
+        if(t.s){var d=new Date(t.s);if(d<earliest)earliest=d;}
+        if(t.e){var d=new Date(t.e);if(d>latest)latest=d;}
+      });
+    });
+  }
+  TS=new Date(earliest.getFullYear(),earliest.getMonth()-1,1);
+  var minEnd=new Date('2027-12-31');
+  TE=latest>minEnd?new Date(latest.getFullYear(),latest.getMonth()+3,0):new Date(2027,11,31);
+  TD=(TE-TS)/86400000;
+  buildMonths();
+}
+
+function buildMonths(){
+  MONTHS=[];
+  var d=new Date(TS.getFullYear(),TS.getMonth(),1);
+  var end=new Date(TE.getFullYear(),TE.getMonth(),1);
+  while(d<=end){MONTHS.push(d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}));d.setMonth(d.getMonth()+1);}
+}
+
+function taskName(tmpl,task){
+  if(LANG==='el'&&TASK_NAMES_EL[tmpl.id]) return TASK_NAMES_EL[tmpl.id];
+  return tmpl.nm;
+}
+
+function sectionName(sec){
+  if(LANG==='el'&&SECTION_NAMES_EL[sec]) return SECTION_NAMES_EL[sec];
+  return sec;
+}
+
+function statusLabel(st){
+  return (STATUS_LABELS[st]&&STATUS_LABELS[st][LANG])||st;
+}
+
+function toast(msg,isErr){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(isErr?' error':'');setTimeout(()=>el.className='toast',2500);}
+
+// === INIT ===
+function init(){
+  fetch(DATA_URL).then(r=>r.json()).then(data=>{
+    DATA=data;
+    localStorage.setItem(DATA_KEY,JSON.stringify(DATA));
+    populateSelect();
+    toast('Loaded');
+  }).catch(()=>{
+    var saved=localStorage.getItem(DATA_KEY);
+    if(saved){DATA=JSON.parse(saved);populateSelect();toast('Loaded from cache');}
+  });
+
+  // Resizable divider
+  setupDivider();
+}
+
+function populateSelect(){
+  var sel=document.getElementById('unitSelect');
+  sel.innerHTML='<option value="">— Select Unit —</option>';
+  if(!DATA||!DATA.units) return;
+  Object.keys(DATA.units).forEach(id=>{
+    var u=DATA.units[id];
+    sel.innerHTML+='<option value="'+id+'">'+u.name+' (Floor '+u.floor+')</option>';
+  });
+  sel.onchange=function(){if(sel.value)renderAll(sel.value);};
+}
+
+// === RESIZABLE DIVIDER ===
+function setupDivider(){
+  var divider=document.getElementById('divider');
+  var left=document.getElementById('leftPane');
+  var container=document.getElementById('splitContainer');
+  var startX,startW;
+
+  divider.addEventListener('mousedown',function(e){
+    e.preventDefault();
+    startX=e.clientX;
+    startW=left.offsetWidth;
+    divider.classList.add('active');
+    document.addEventListener('mousemove',onDrag);
+    document.addEventListener('mouseup',stopDrag);
+  });
+
+  function onDrag(e){
+    var newW=startW+(e.clientX-startX);
+    var minW=300,maxW=container.offsetWidth*0.6;
+    if(newW>=minW&&newW<=maxW) left.style.width=newW+'px';
+  }
+  function stopDrag(){
+    divider.classList.remove('active');
+    document.removeEventListener('mousemove',onDrag);
+    document.removeEventListener('mouseup',stopDrag);
+  }
+}
+
+// === RENDER ===
+function renderAll(uid){
+  CURRENT_UNIT=uid;
+  computeTimelineRange();
+  renderTable();
+  renderGantt();
+  document.getElementById('navRange').textContent=MONTHS[0]+' — '+MONTHS[MONTHS.length-1];
+}
+
+// === TASK TABLE (Left Pane) ===
+function renderTable(){
+  var unit=DATA.units[CURRENT_UNIT];
+  var tmpl=DATA.taskTemplate;
+  var tasks=unit.tasks||{};
+  var html='';
+  var currentSection=null;
+
+  // Collect task IDs per section for drag reorder
+  tmpl.forEach(function(t){
+    if(t.sec!==undefined){
+      if(currentSection!==null) html+='</div>'; // close previous drag group
+      currentSection=t.sec;
+      html+='<div class="task-section" data-section="'+esc(t.sec)+'">';
+      html+='<span>'+sectionName(t.sec)+'</span>';
+      html+='<button class="btn btn-primary btn-sm" onclick="addTaskToSection(\''+esc(t.sec).replace(/'/g,"\\'")+'\')" style="font-size:10px;padding:2px 8px">+</button>';
+      html+='</div>';
+      html+='<div class="section-tasks" data-section="'+esc(t.sec)+'">';
+      return;
+    }
+    var task=tasks[t.id]||{};
+    var st=task.st||'pending';
+    var icon=TASK_ICONS[t.id]||'';
+    var nm=taskName(t,task);
+    var note=task.nt||'';
+
+    html+='<div class="task-row st-'+st+'" data-tid="'+t.id+'" draggable="true">';
+    html+='<div class="td td-name">';
+    if(icon) html+='<span class="task-icon">'+icon+'</span>';
+    html+='<span class="task-name-text" data-field="name" data-tid="'+t.id+'">'+esc(nm)+'</span></div>';
+    html+='<div class="td td-status"><span class="status-badge '+st+'" data-tid="'+t.id+'" onclick="cycleStatus(\''+t.id+'\')">'+statusLabel(st)+'</span></div>';
+    html+='<div class="td td-start" data-field="start" data-tid="'+t.id+'">'+(task.s?fmt(task.s):'—')+'</div>';
+    html+='<div class="td td-end" data-field="end" data-tid="'+t.id+'">'+(task.e?fmt(task.e):'—')+'</div>';
+    html+='<div class="td td-note" data-field="note" data-tid="'+t.id+'">'+esc(note)+'</div>';
+    html+='<div class="td td-actions"><button class="btn btn-danger btn-sm" onclick="requestDelete(\''+t.id+'\')" title="Delete" style="padding:2px 6px;font-size:10px">✕</button></div>';
+    html+='</div>';
+  });
+  if(currentSection!==null) html+='</div>';
+
+  // Shared Systems section
+  var shared=DATA.building&&DATA.building.shared;
+  if(shared){
+    html+='<div class="task-section">'+sectionName('Building Shared Systems')+'</div>';
+    html+='<div class="shared-section">';
+    html+='<div class="shared-title">'+(LANG==='el'?'Κοινόχρηστα Συστήματα Κτιρίου':'Building Shared Systems')+'</div>';
+    Object.keys(shared).forEach(function(key){
+      var s=shared[key];
+      var icon=TASK_ICONS[key]||'';
+      var nm=(LANG==='el'&&SHARED_NAMES_EL[key])?SHARED_NAMES_EL[key]:key.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      var st=s.status||'pending';
+      html+='<div class="task-row st-'+st+'" style="border-left:3px solid #1d3a5f">';
+      html+='<div class="td td-name">'+icon+' <span class="task-name-text">'+esc(nm)+'</span></div>';
+      html+='<div class="td td-status"><span class="status-badge '+st+'">'+statusLabel(st)+'</span></div>';
+      html+='<div class="td td-start">'+(s.start?fmt(s.start):'—')+'</div>';
+      html+='<div class="td td-end">'+(s.end?fmt(s.end):'—')+'</div>';
+      html+='<div class="td td-note">'+esc(s.note||'')+'</div>';
+      html+='<div class="td td-actions"></div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
+  document.getElementById('tableScroll').innerHTML=html;
+  enableInlineEditing();
+  enableDragReorder();
+}
+
+// === GANTT TIMELINE (Right Pane) ===
+function renderGantt(){
+  var unit=DATA.units[CURRENT_UNIT];
+  var tmpl=DATA.taskTemplate;
+  var tasks=unit.tasks||{};
+  var tp=todayPct();
+  var html='';
+
+  // Header
+  html+='<div class="gantt-header-row"><div class="gh-label"></div><div class="gh-months">';
+  for(var mi=0;mi<MONTHS.length;mi++){
+    var monthStart=new Date(TS.getFullYear(),TS.getMonth()+mi,1);
+    var nextMonth=new Date(TS.getFullYear(),TS.getMonth()+mi+1,1);
+    var monthWid=wid(monthStart.toISOString().slice(0,10),nextMonth.toISOString().slice(0,10));
+    var monthLeft=lft(monthStart.toISOString().slice(0,10));
+    html+='<div class="gh-month" style="left:'+monthLeft+';width:'+monthWid+'">'+MONTHS[mi]+'</div>';
+  }
+  html+='</div></div>';
+
+  // Task rows
+  tmpl.forEach(function(t){
+    if(t.sec!==undefined){
+      html+='<div class="g-section-hdr">'+sectionName(t.sec)+'</div>';
+      return;
+    }
+    var task=tasks[t.id]||{};
+    var st=task.st||'pending';
+    var s=task.s,e=task.e;
+    var isMilestone=MILESTONE_TASKS.indexOf(t.id)>=0;
+
+    html+='<div class="g-task-row st-'+st+'" data-tid="'+t.id+'">';
+
+    // Month grid lines
+    for(var m=0;m<MONTHS.length;m++){
+      var ms=new Date(TS.getFullYear(),TS.getMonth()+m+1,1);
+      if(ms<=TE) html+='<div class="month-grid-line" style="left:'+pct(ms.toISOString().slice(0,10))+'%"></div>';
+    }
+
+    // Today line
+    html+='<div class="today-line" style="left:'+tp+'%"></div>';
+
+    if(s&&e){
+      if(isMilestone){
+        // Show as diamond at end date
+        var mLeft=lft(e);
+        html+='<div class="milestone '+st+'" style="left:'+mLeft+'" title="'+fmt(e)+'">';
+        html+='<div class="milestone-tooltip">'+taskName(t,task)+' — '+fmt(e)+'</div>';
+        html+='</div>';
+      } else {
+        // Check for segments
+        var segs=task.segments;
+        if(segs&&segs.length>1){
+          segs.forEach(function(seg,si){
+            if(!seg.s||!seg.e) return;
+            var dateStr=fmt(seg.s)+' → '+fmt(seg.e);
+            var segPct=parseFloat(wid(seg.s,seg.e));
+            html+='<div class="bar '+st+'" style="left:calc('+lft(seg.s)+' + 2px);width:calc('+wid(seg.s,seg.e)+' - 4px)">';
+            if(segPct>5) html+='<span>'+dateStr+'</span>';
+            html+='</div>';
+          });
+        } else {
+          var dateStr=fmt(s)+' → '+fmt(e);
+          var barPct=parseFloat(wid(s,e));
+          html+='<div class="bar '+st+'" style="left:calc('+lft(s)+' + 2px);width:calc('+wid(s,e)+' - 4px)">';
+          if(barPct>5) html+='<span>'+dateStr+'</span>';
+          html+='</div>';
+        }
+      }
+    }
+    html+='</div>';
+  });
+
+  // Shared systems in Gantt
+  var shared=DATA.building&&DATA.building.shared;
+  if(shared){
+    html+='<div class="g-section-hdr">'+sectionName('Building Shared Systems')+'</div>';
+    Object.keys(shared).forEach(function(key){
+      var s=shared[key];
+      var st=s.status||'pending';
+      html+='<div class="g-task-row st-'+st+'">';
+      for(var m=0;m<MONTHS.length;m++){
+        var ms=new Date(TS.getFullYear(),TS.getMonth()+m+1,1);
+        if(ms<=TE) html+='<div class="month-grid-line" style="left:'+pct(ms.toISOString().slice(0,10))+'%"></div>';
+      }
+      html+='<div class="today-line" style="left:'+tp+'%"></div>';
+      if(s.start&&s.end){
+        var dateStr=fmt(s.start)+' → '+fmt(s.end);
+        var barPct=parseFloat(wid(s.start,s.end));
+        html+='<div class="bar '+st+'" style="left:calc('+lft(s.start)+' + 2px);width:calc('+wid(s.start,s.end)+' - 4px)">';
+        if(barPct>5) html+='<span>'+dateStr+'</span>';
+        html+='</div>';
+      }
+      html+='</div>';
+    });
+  }
+
+  document.getElementById('ganttInner').innerHTML=html;
+}
+
+// === INLINE EDITING ===
+function enableInlineEditing(){
+  // Click to edit: name, note, start, end
+  var editables=document.querySelectorAll('.td[data-field]');
+  editables.forEach(function(td){
+    td.addEventListener('dblclick',function(e){
+      var field=td.dataset.field;
+      var tid=td.dataset.tid;
+      if(!tid||!CURRENT_UNIT) return;
+      e.stopPropagation();
+      startInlineEdit(td,field,tid);
+    });
+    // Single click for start/end dates
+    var field=td.dataset.field;
+    if(field==='start'||field==='end'){
+      td.style.cursor='pointer';
+      td.addEventListener('click',function(e){
+        var tid=td.dataset.tid;
+        if(!tid||!CURRENT_UNIT) return;
+        e.stopPropagation();
+        startInlineEdit(td,field,tid);
+      });
+    }
+  });
+}
+
+function startInlineEdit(td,field,tid){
+  // Already editing?
+  if(td.querySelector('.inline-edit')) return;
+  var task=DATA.units[CURRENT_UNIT].tasks[tid];
+  if(!task) return;
+  var originalHTML=td.innerHTML;
+  var input;
+
+  if(field==='start'||field==='end'){
+    var val=field==='start'?task.s:task.e;
+    input=document.createElement('input');
+    input.type='date';
+    input.className='inline-edit inline-edit-date';
+    input.value=val||'';
+  } else if(field==='name'){
+    var tmpl=DATA.taskTemplate.find(function(t){return t.id===tid;});
+    input=document.createElement('input');
+    input.type='text';
+    input.className='inline-edit';
+    input.value=tmpl?tmpl.nm:'';
+  } else {
+    input=document.createElement('input');
+    input.type='text';
+    input.className='inline-edit';
+    input.value=task.nt||'';
+  }
+
+  td.innerHTML='';
+  td.appendChild(input);
+  input.focus();
+
+  function save(){
+    var val=input.value.trim();
+    if(field==='start'){
+      task.s=val||'';
+    } else if(field==='end'){
+      task.e=val||'';
+      if(task.s&&task.e&&new Date(task.e)<new Date(task.s)){
+        toast('End must be after start',true);
+        td.innerHTML=originalHTML;
+        return;
+      }
+    } else if(field==='name'){
+      var tmpl=DATA.taskTemplate.find(function(t){return t.id===tid;});
+      if(tmpl&&val) tmpl.nm=val;
+    } else {
+      task.nt=val;
+    }
+    autoSave();
+    renderAll(CURRENT_UNIT);
+  }
+
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();save();}
+    if(e.key==='Escape'){td.innerHTML=originalHTML;}
+  });
+  input.addEventListener('blur',function(){save();});
+}
+
+// === STATUS CYCLE ===
+function cycleStatus(tid){
+  if(!CURRENT_UNIT||!DATA.units[CURRENT_UNIT].tasks[tid]) return;
+  var task=DATA.units[CURRENT_UNIT].tasks[tid];
+  var idx=STATUS_CYCLE.indexOf(task.st||'pending');
+  idx=(idx+1)%STATUS_CYCLE.length;
+  task.st=STATUS_CYCLE[idx];
+  autoSave();
+  renderAll(CURRENT_UNIT);
+}
+
+// === ADD/DELETE TASKS ===
+function addNewTask(){
+  if(!CURRENT_UNIT) return;
+  // Find last section
+  var lastSec=null,lastCat=0;
+  DATA.taskTemplate.forEach(function(t){
+    if(t.sec!==undefined) lastSec=t.sec;
+    if(t.cat!==undefined&&t.cat>lastCat) lastCat=t.cat;
+  });
+  addTaskToSection(lastSec);
+}
+
+function addTaskToSection(sec){
+  if(!CURRENT_UNIT) return;
+  var id='custom_'+Date.now();
+  // Find section index in template
+  var insertIdx=DATA.taskTemplate.length;
+  for(var i=0;i<DATA.taskTemplate.length;i++){
+    if(DATA.taskTemplate[i].sec===sec){
+      // Find end of section
+      for(var j=i+1;j<DATA.taskTemplate.length;j++){
+        if(DATA.taskTemplate[j].sec!==undefined){insertIdx=j;break;}
+        insertIdx=j+1;
+      }
+      break;
+    }
+  }
+  var nm=LANG==='el'?'Νέα Εργασία':'New Task';
+  DATA.taskTemplate.splice(insertIdx,0,{id:id,nm:nm,cat:0});
+  if(!DATA.units[CURRENT_UNIT].tasks) DATA.units[CURRENT_UNIT].tasks={};
+  DATA.units[CURRENT_UNIT].tasks[id]={st:'pending',s:'',e:'',nt:''};
+  autoSave();
+  renderAll(CURRENT_UNIT);
+  toast('Task added — edit inline');
+}
+
+function requestDelete(tid){
+  DELETE_TARGET=tid;
+  var tmpl=DATA.taskTemplate.find(function(t){return t.id===tid;});
+  document.getElementById('confirmText').textContent=(tmpl?tmpl.nm:tid)+' — This cannot be undone.';
+  document.getElementById('confirmOverlay').classList.add('active');
+}
+function cancelDelete(){document.getElementById('confirmOverlay').classList.remove('active');DELETE_TARGET=null;}
+function confirmDelete(){
+  if(!DELETE_TARGET||!CURRENT_UNIT){cancelDelete();return;}
+  // Remove from template
+  DATA.taskTemplate=DATA.taskTemplate.filter(function(t){return t.id!==DELETE_TARGET;});
+  // Remove from all units
+  Object.keys(DATA.units).forEach(function(uid){
+    if(DATA.units[uid].tasks&&DATA.units[uid].tasks[DELETE_TARGET]) delete DATA.units[uid].tasks[DELETE_TARGET];
+  });
+  autoSave();
+  cancelDelete();
+  renderAll(CURRENT_UNIT);
+  toast('Task deleted');
+}
+
+// === DRAG REORDER ===
+function enableDragReorder(){
+  var rows=document.querySelectorAll('.task-row[draggable="true"]');
+  rows.forEach(function(row){
+    row.addEventListener('dragstart',function(e){
+      e.dataTransfer.setData('text/plain',row.dataset.tid);
+      row.style.opacity='0.4';
+    });
+    row.addEventListener('dragend',function(){row.style.opacity='1';});
+    row.addEventListener('dragover',function(e){e.preventDefault();row.classList.add('drag-over');});
+    row.addEventListener('dragleave',function(){row.classList.remove('drag-over');});
+    row.addEventListener('drop',function(e){
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      var srcId=e.dataTransfer.getData('text/plain');
+      var dstId=row.dataset.tid;
+      if(!srcId||!dstId||srcId===dstId) return;
+      reorderTask(srcId,dstId);
+    });
+  });
+}
+
+function reorderTask(srcId,dstId){
+  var srcIdx=-1,dstIdx=-1;
+  for(var i=0;i<DATA.taskTemplate.length;i++){
+    if(DATA.taskTemplate[i].id===srcId) srcIdx=i;
+    if(DATA.taskTemplate[i].id===dstId) dstIdx=i;
+  }
+  if(srcIdx<0||dstIdx<0) return;
+  var item=DATA.taskTemplate.splice(srcIdx,1)[0];
+  // Adjust dstIdx if needed
+  if(srcIdx<dstIdx) dstIdx--;
+  DATA.taskTemplate.splice(dstIdx,0,item);
+  autoSave();
+  renderAll(CURRENT_UNIT);
+}
+
+// === GANTT SCROLL ===
+function scrollGantt(dir){
+  var wrap=document.getElementById('ganttWrap');
+  wrap.scrollBy({left:dir*300,behavior:'smooth'});
+}
+function scrollToToday(){
+  var wrap=document.getElementById('ganttWrap');
+  var line=wrap.querySelector('.today-line');
+  if(line){var rect=wrap.getBoundingClientRect();wrap.scrollTo({left:line.offsetLeft-rect.width/2,behavior:'smooth'});}
+}
+
+// === SAVE ===
+function autoSave(){
+  try{localStorage.setItem(DATA_KEY,JSON.stringify(DATA));}catch(e){}
+}
+
+function saveData(){
+  var token=localStorage.getItem('gh_pat_token');
+  if(!token){
+    token=prompt('Enter GitHub PAT (repo scope).\n\nCreate at: https://github.com/settings/tokens');
+    if(!token||!token.trim()) return;
+    localStorage.setItem('gh_pat_token',token.trim());
+  }
+  var apiBase='https://api.github.com/repos/'+GH_REPO+'/contents/'+GH_DATA_PATH;
+  var content=btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))));
+  toast('Saving…');
+  fetch(apiBase,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(!r.ok) throw new Error('Fetch failed: '+r.status);return r.json();})
+    .then(function(file){
+      return fetch(apiBase,{
+        method:'PUT',
+        headers:{'Authorization':'token '+token,'Content-Type':'application/vnd.github.v3+json'},
+        body:JSON.stringify({message:'auto: internal tool update — '+new Date().toLocaleString('en-GB'),content:content,sha:file.sha})
+      });
+    })
+    .then(function(r){if(!r.ok) throw new Error('Save failed: '+r.status);return r.json();})
+    .then(function(){toast('✓ Saved to GitHub');autoSave();})
+    .catch(function(e){
+      toast('✗ '+e.message,true);
+      if(e.message&&(e.message.indexOf('401')>-1||e.message.indexOf('Bad credentials')>-1)){
+        localStorage.removeItem('gh_pat_token');
+        toast('Token cleared',true);
+      }
+    });
+}
+
+// === EXPORT PDF ===
+function exportPDF(){
+  var unit=DATA.units[CURRENT_UNIT];
+  if(!unit){toast('Select a unit first',true);return;}
+  var w=window.open('','_blank');
+  var title=unit.name+' — Internal Construction Schedule';
+  var html='<!DOCTYPE html><html><head><title>'+title+'</title><style>';
+  html+='body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#333;padding:20px;font-size:11px}';
+  html+='h1{font-size:16px;margin-bottom:4px}h2{font-size:12px;color:#666;margin-bottom:16px}';
+  html+='table{width:100%;border-collapse:collapse;margin-bottom:20px}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}';
+  html+='th{background:#f5f5f5;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}';
+  html+='.section{background:#e8e8e8;font-weight:bold;font-size:10px;text-transform:uppercase;letter-spacing:1px}';
+  html+='.complete{color:#2d8a52}.inprogress{color:#8a6420}.critical{color:#c02040}.blocked{color:#c06020}.ordered{color:#1d7a44}.pending{color:#666}';
+  html+='@media print{body{padding:0}}</style></head><body>';
+  html+='<h1>'+title+'</h1>';
+  html+='<h2>Ipeirou 22, Galatsi · Floor '+unit.floor+' · '+(unit.size_m2||'')+' m² · LEED Platinum · Generated '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</h2>';
+  html+='<table><tr><th>Task</th><th>Status</th><th>Start</th><th>End</th><th>Notes</th></tr>';
+  DATA.taskTemplate.forEach(function(t){
+    if(t.sec){html+='<tr class="section"><td colspan="5">'+sectionName(t.sec)+'</td></tr>';return;}
+    var task=unit.tasks[t.id]||{};
+    var st=task.st||'pending';
+    html+='<tr><td>'+(TASK_ICONS[t.id]||'')+' '+taskName(t,task)+'</td><td class="'+st+'">'+statusLabel(st)+'</td>';
+    html+='<td>'+(task.s||'—')+'</td><td>'+(task.e||'—')+'</td><td>'+(task.nt||'')+'</td></tr>';
+  });
+  // Shared systems
+  var shared=DATA.building&&DATA.building.shared;
+  if(shared){
+    html+='<tr class="section"><td colspan="5">'+sectionName('Building Shared Systems')+'</td></tr>';
+    Object.keys(shared).forEach(function(key){
+      var s=shared[key];
+      var nm=(LANG==='el'&&SHARED_NAMES_EL[key])?SHARED_NAMES_EL[key]:key.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      html+='<tr><td>'+nm+'</td><td class="'+(s.status||'pending')+'">'+statusLabel(s.status||'pending')+'</td>';
+      html+='<td>'+(s.start||'—')+'</td><td>'+(s.end||'—')+'</td><td>'+(s.note||'')+'</td></tr>';
+    });
+  }
+  html+='</table></body></html>';
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function(){w.print();},300);
+}
+
+// === LANG TOGGLE ===
+function toggleLang(){
+  LANG=LANG==='en'?'el':'en';
+  document.getElementById('langBtn').textContent=LANG==='en'?'GR Ελληνικά':'EN English';
+  document.getElementById('hTitle').textContent=LANG==='el'?'Οικισμός Γαλατσίου — Εργαλείο Διαχείρισης':'Galatsi Residence — Internal Tool';
+  document.getElementById('hSub').textContent=LANG==='el'?'Ιπείρου 22, Γαλάτσι · LEED Platinum · Διαχείριση Κατασκευής':'Ipeirou 22, Galatsi · LEED Platinum · Construction Management';
+  if(CURRENT_UNIT) renderAll(CURRENT_UNIT);
+}
+
+// === KEYBOARD ===
+document.addEventListener('keydown',function(e){
+  if(e.key==='s'&&(e.metaKey||e.ctrlKey)){e.preventDefault();saveData();}
+});
+
+// === START ===
+init();
+</script>
+</body>
+</html>
