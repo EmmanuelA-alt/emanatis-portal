@@ -802,10 +802,25 @@ function renderUnit(uid){
     var progPct = 0, progColor = 'gray';
     if(st === 'complete'){ progPct = 100; progColor = 'green'; }
     else if(s && e){
-      var tStart = new Date(s).getTime(), tEnd = new Date(e).getTime(), tNow = Date.now();
-      if(tNow <= tStart) progPct = 0;
-      else if(tNow >= tEnd) progPct = 100;
-      else progPct = Math.round((tNow - tStart) / (tEnd - tStart) * 100);
+      // If task has segments, calculate progress across all segments
+      var segs = task.segments;
+      if(segs && segs.length > 1){
+        var totalDays = 0, elapsedDays = 0, tNow = Date.now();
+        segs.forEach(function(seg){
+          if(!seg.s || !seg.e) return;
+          var segStart = new Date(seg.s).getTime(), segEnd = new Date(seg.e).getTime();
+          var segLen = (segEnd - segStart) / 86400000;
+          totalDays += segLen;
+          if(tNow >= segEnd) elapsedDays += segLen;
+          else if(tNow > segStart) elapsedDays += (tNow - segStart) / 86400000;
+        });
+        progPct = totalDays > 0 ? Math.round(elapsedDays / totalDays * 100) : 0;
+      } else {
+        var tStart = new Date(s).getTime(), tEnd = new Date(e).getTime(), tNow = Date.now();
+        if(tNow <= tStart) progPct = 0;
+        else if(tNow >= tEnd) progPct = 100;
+        else progPct = Math.round((tNow - tStart) / (tEnd - tStart) * 100);
+      }
       if(st === 'critical') progColor = 'red';
       else if(st === 'blocked') progColor = 'red';
       else if(st === 'inprogress') progColor = progPct >= 100 ? 'green' : 'amber';
@@ -838,9 +853,11 @@ function renderUnit(uid){
           if(!segS || !segE) return;
           var segDateStr = fmt(segS)+' → '+fmt(segE);
           var segBarPct = parseFloat(wid(segS, segE));
-          var showSegDatesInside = segBarPct > 5;
+          var showSegDatesInside = segBarPct > 8;
           if(!showSegDatesInside){
-            html += '<div class="bar-date-external" style="position:absolute;top:50%;transform:translateY(-50%);left:calc('+lft(segS)+' - 110px);font-size:10px;color:#4dba78;white-space:nowrap">'+segDateStr+'</div>';
+            // Stagger external dates vertically so they don't overlap
+            var extTop = (si % 2 === 0) ? 'calc(50% - 22px)' : 'calc(50% + 8px)';
+            html += '<div class="bar-date-external" style="position:absolute;top:'+extTop+';transform:translateY(-50%);left:calc('+lft(segS)+' - 120px);font-size:10px;color:#4dba78;white-space:nowrap;z-index:3">'+segDateStr+'</div>';
           }
           html += '<div class="bar-segment bar '+st+'" data-tid="'+t.id+'" data-seg="'+si+'" data-start="'+segS+'" data-end="'+segE+'" style="left:calc('+lft(segS)+' + 2px);width:calc('+wid(segS,segE)+' - 4px)"><div class="handle handle-left"></div>'+(showSegDatesInside?'<span class="bar-date">'+segDateStr+'</span>':'')+'<div class="handle handle-right"></div><button class="bar-menu-btn" data-tid="'+t.id+'" data-seg="'+si+'">⋮</button></div>';
           // Draw dashed gap between segments (except after last)
