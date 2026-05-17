@@ -179,6 +179,7 @@ body.client-mode .note-add{display:none!important}
 body.client-mode .notes-custom{display:none!important}
 body.client-mode .btn{display:none!important}
 body.client-mode .btn-nav,body.client-mode .btn-today{display:inline-block!important}
+body.client-mode #requestUpdateBtn{display:block!important}
 body.client-mode .lang-btn{display:block!important}
 body.client-mode select{display:none!important}
 body.client-mode .client-info input{background:transparent!important;border:none!important;padding:0!important;color:#ccc!important}
@@ -903,6 +904,34 @@ function renderUnit(uid){
   html += '<input type="date" id="handoverDateInput" value="'+(unit.handoverDate||'')+'" style="background:#1e1e2e;border:1px solid #3a3a5a;color:#e8e8e8;padding:6px 10px;border-radius:6px;font-size:13px;display:none" onchange="saveHandover(this.value)">';
   html += '</div></div>';
 
+  // Request Update button + Contact + Last Updated (visible in all modes)
+  html += '<div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">';
+
+  // Request Update
+  html += '<div style="background:#16161d;border:1px solid #2a5080;border-radius:12px;padding:18px 20px;text-align:center">';
+  html += '<div style="font-size:11px;color:#5ba3f5;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:10px">'+(LANG==='el'?'Αίτημα Ενημέρωσης':'Request Update')+'</div>';
+  html += '<button id="requestUpdateBtn" onclick="requestUpdate()" style="background:linear-gradient(90deg,#1e3a5f,#2a5080);border:1px solid #2a5080;color:#5ba3f5;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s">'+(LANG==='el'?'📨 Ζητήστε Ενημέρωση':'📨 Request Status Update')+'</button>';
+  html += '<div id="updateConfirm" style="display:none;margin-top:10px;font-size:12px;color:#4dba78">✓ '+(LANG==='el'?'Το αίτημα στάλθηκε':'Request sent')+'</div>';
+  html += '</div>';
+
+  // Contact
+  html += '<div style="background:#16161d;border:1px solid #2a2a3a;border-radius:12px;padding:18px 20px">';
+  html += '<div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:10px">'+(LANG==='el'?'Επικοινωνία':'Contact')+'</div>';
+  html += '<div style="font-size:13px;color:#ccc;line-height:1.8">';
+  html += '<div style="color:#888">'+(LANG==='el'?'Διαχειριστής Έργου':'Project Manager')+'</div>';
+  html += '<div style="color:#5ba3f5">Dimitris Skendo</div>';
+  html += '<div style="color:#888;font-size:12px">dimitris@emanatis.com</div>';
+  html += '</div></div>';
+
+  // Last Updated
+  html += '<div style="background:#16161d;border:1px solid #2a2a3a;border-radius:12px;padding:18px 20px;text-align:center">';
+  html += '<div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:10px">'+(LANG==='el'?'Τελευταία Ενημέρωση':'Last Updated')+'</div>';
+  html += '<div id="lastUpdateDisplay" style="font-size:14px;color:#ccc">'+(DATA._lastSaved ? new Date(DATA._lastSaved).toLocaleDateString(LANG==='el'?'el-GR':'en-GB',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : new Date().toLocaleDateString(LANG==='el'?'el-GR':'en-GB',{day:'numeric',month:'long',year:'numeric'}))+'</div>';
+  html += '<div style="font-size:11px;color:#555;margin-top:6px">'+(LANG==='el'?'Δεδομένα σε πραγματικό χρόνο':'Live data from GitHub')+'</div>';
+  html += '</div>';
+
+  html += '</div>';
+
   // Notes
   var notes = unit.notes || {};
   var noteMeta = unit._noteMeta || {};
@@ -1041,6 +1070,30 @@ function deleteNote(){
   closeNoteEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Deleted');
 }
 
+// === REQUEST UPDATE ===
+function requestUpdate(){
+  var btn = document.getElementById('requestUpdateBtn');
+  var conf = document.getElementById('updateConfirm');
+  if(!btn || !conf) return;
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+  btn.textContent = LANG==='el'?'Αποστολή...':'Sending...';
+  var unitName = DATA.units[CURRENT_UNIT] ? DATA.units[CURRENT_UNIT].name : CURRENT_UNIT;
+  var unitClient = DATA.units[CURRENT_UNIT] ? (DATA.units[CURRENT_UNIT].client || 'Unknown') : 'Unknown';
+  var unitEmail = DATA.units[CURRENT_UNIT] ? (DATA.units[CURRENT_UNIT].email || '') : '';
+  var ts = new Date().toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  var subject = 'Update Request — ' + unitName + ' (' + unitClient + ') — ' + ts;
+  var body = 'A status update has been requested for unit ' + unitName + ' (' + unitClient + '). Requested at: ' + ts + '.';
+  if(unitEmail) body += '\nClient email on file: ' + unitEmail;
+  body += '\n\nPlease review the timeline and provide an update.';
+  // Use mailto as fallback
+  var mailto = 'mailto:orpheus@emanatis.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  window.open(mailto, '_blank');
+  conf.style.display = 'block';
+  btn.textContent = LANG==='el'?'✓ Απεστάλη':'✓ Sent';
+  setTimeout(function(){ btn.disabled=false; btn.style.opacity='1'; btn.textContent=LANG==='el'?'📨 Ζητήστε Ενημέρωση':'📨 Request Status Update'; conf.style.display='none'; }, 5000);
+}
+
 // === SAVE/LOAD ===
 function autoSave(){
   try {
@@ -1050,6 +1103,7 @@ function autoSave(){
   } catch(e){}
 }
 function saveData(){
+  DATA._lastSaved = new Date().toISOString();
   var token = localStorage.getItem('gh_pat_token');
   if(!token){
     token = prompt('Enter your GitHub Personal Access Token (with repo scope).\n\nThis is stored in your browser only — never sent anywhere else.\n\nCreate one at: https://github.com/settings/tokens\n→ New token → select "repo" → copy and paste here.');
