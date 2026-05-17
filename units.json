@@ -14,7 +14,7 @@
     ],
     "shared": {
       "elevator": {
-        "supplier": "iLift",
+        "supplier": "Kleeman",
         "install": "2026-04-27",
         "end": "2026-05-09"
       },
@@ -148,7 +148,7 @@
     },
     {
       "id": "t13",
-      "nm": "Elevator - iLift",
+      "nm": "Elevator - Kleeman",
       "cat": 4
     },
     {
@@ -3167,8 +3167,8 @@
         },
         "t15": {
           "st": "pending",
-          "s": "2026-07-24",
-          "e": "2026-08-06",
+          "s": "2026-09-01",
+          "e": "2026-09-30",
           "nt": "Painted and/or PVC"
         },
         "hvac": {
