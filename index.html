@@ -814,23 +814,33 @@ function renderUnit(uid){
   // Calculate real completion percentage from task data
   var completedTasks = counts.complete || 0;
   var totalTasks = counts.total || 1;
-  var pctComplete = Math.round((completedTasks / totalTasks) * 100);
-  // Also calculate time-based progress for inprogress tasks
-  var timeProgress = 0, timeTotal = 0;
-  Object.values(tasks).forEach(function(t){
+
+  // Category weights — structure and MEP are the heavy lifting
+  var CAT_WEIGHT = [3, 2.5, 1.5, 1.5, 1, 0.5]; // Structure=3, MEP=2.5, Interior=1.5, Doors=1.5, Building=1, Handover=0.5
+
+  // Build task-to-category map from template
+  var taskCatMap = {};
+  DATA.taskTemplate.forEach(function(t){ if(t.id) taskCatMap[t.id] = t.cat || 0; });
+
+  // Weighted progress calculation
+  var wProgress = 0, wTotal = 0;
+  Object.keys(tasks).forEach(function(tid){
+    var t = tasks[tid];
     if(!t.s || !t.e) return;
+    var cat = taskCatMap[tid] !== undefined ? taskCatMap[tid] : 1;
+    var w = CAT_WEIGHT[cat] || 1;
     var ts = new Date(t.s).getTime(), te = new Date(t.e).getTime(), tn = Date.now();
-    if(t.st === 'complete'){ timeProgress += 1; timeTotal += 1; }
-    else {
-      var p = tn <= ts ? 0 : (tn >= te ? 1 : (tn - ts) / (te - ts));
-      timeProgress += p; timeTotal += 1;
-    }
+    var p;
+    if(t.st === 'complete') p = 1;
+    else if(tn <= ts) p = 0;
+    else if(tn >= te) p = 1;
+    else p = (tn - ts) / (te - ts);
+    wProgress += p * w;
+    wTotal += w;
   });
-  var weightedPct = timeTotal > 0 ? Math.round((timeProgress / timeTotal) * 100) : pctComplete;
-  // Use the higher of task-complete % vs time-weighted %
-  var overallPct = Math.max(pctComplete, weightedPct);
+  var overallPct = wTotal > 0 ? Math.round((wProgress / wTotal) * 100) : 0;
   var pctColor = overallPct >= 80 ? '#4dba78' : overallPct >= 50 ? '#f0a830' : '#f05070';
-  var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : overallPct >= 50 ? (LANG==='el'?'Σε Εξέλιξη':'In Progress') : (LANG==='el'?'Σε Εξέλιξη':'In Progress');
+  var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : overallPct >= 50 ? (LANG==='el'?'Σε Εξέλιξη':'In Progress') : (LANG==='el'?'Ξεκινώντας':'Getting Started');
 
   html += '<div class="stat" style="position:relative">';
   html += '<div class="slabel">'+(LANG==='el'?'Πρόοδος':'Progress')+'</div>';
