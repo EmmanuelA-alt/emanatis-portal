@@ -14,7 +14,7 @@
     ],
     "shared": {
       "elevator": {
-        "supplier": "Kleeman",
+        "supplier": "iLift",
         "install": "2026-04-27",
         "end": "2026-05-09"
       },
@@ -148,7 +148,7 @@
     },
     {
       "id": "t13",
-      "nm": "Elevator - Kleeman",
+      "nm": "Elevator - iLift",
       "cat": 4
     },
     {
