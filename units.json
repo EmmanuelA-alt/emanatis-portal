@@ -3244,7 +3244,7 @@
           "nt": "After HVAC + flooring"
         },
         "t11": {
-          "st": "pending",
+          "st": "inprogress",
           "s": "2026-05-27",
           "e": "2026-06-12",
           "nt": "Switches, panels, smart home, lighting"
@@ -3335,8 +3335,8 @@
         },
         "pent": {
           "st": "pending",
-          "s": "2026-05-02",
-          "e": "2026-05-31",
+          "s": "2026-06-22",
+          "e": "2026-07-21",
           "nt": "160sqm maisonette - independent"
         },
         "t24": {
