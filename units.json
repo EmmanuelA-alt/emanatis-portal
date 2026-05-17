@@ -3214,14 +3214,14 @@
         },
         "t10": {
           "st": "blocked",
-          "s": "2026-05-15",
-          "e": "2026-05-31",
+          "s": "2026-06-30",
+          "e": "2026-07-16",
           "nt": "After HVAC + flooring"
         },
         "t11": {
           "st": "inprogress",
           "s": "2026-05-27",
-          "e": "2026-06-12",
+          "e": "2026-07-31",
           "nt": "Switches, panels, smart home, lighting"
         },
         "t19": {
@@ -3232,80 +3232,100 @@
         },
         "t20": {
           "st": "pending",
-          "s": "2026-07-20",
-          "e": "2026-08-13",
-          "nt": "Phased - unit complete April"
+          "s": "2026-07-07",
+          "e": "2026-07-31",
+          "nt": "Phased - unit complete April",
+          "segments": [
+            {
+              "s": "2026-07-07",
+              "e": "2026-07-31"
+            },
+            {
+              "s": "2026-09-01",
+              "e": "2026-09-15"
+            }
+          ]
         },
         "t6": {
           "st": "blocked",
-          "s": "2026-05-21",
-          "e": "2026-06-04",
+          "s": "2026-07-04",
+          "e": "2026-07-09",
           "nt": "After plumbing + electrical rough-in"
         },
         "t7": {
           "st": "pending",
-          "s": "2026-05-21",
-          "e": "2026-06-06",
+          "s": "2026-07-10",
+          "e": "2026-07-29",
           "nt": "After HVAC complete - client chosen"
         },
         "t8": {
           "st": "pending",
-          "s": "2026-07-23",
-          "e": "2026-08-01",
+          "s": "2026-07-20",
+          "e": "2026-07-31",
           "nt": "4 days - after flooring complete"
         },
         "t9": {
           "st": "critical",
-          "s": "2026-06-06",
-          "e": "2026-06-22",
+          "s": "2026-06-27",
+          "e": "2026-07-13",
           "nt": "Selection meeting needed - CRITICAL PATH"
         },
         "t14": {
           "st": "pending",
-          "s": "2026-06-30",
-          "e": "2026-07-11",
-          "nt": "4 days - after windows installed"
+          "s": "2026-07-20",
+          "e": "2026-07-31",
+          "nt": "4 days - after windows installed",
+          "segments": [
+            {
+              "s": "2026-07-20",
+              "e": "2026-07-31"
+            },
+            {
+              "s": "2026-08-31",
+              "e": "2026-09-07"
+            }
+          ]
         },
         "t4": {
           "st": "pending",
-          "s": "2026-06-30",
-          "e": "2026-07-09",
+          "s": "2026-07-22",
+          "e": "2026-07-31",
           "nt": "Ordered - delivery early April"
         },
         "t5": {
           "st": "pending",
-          "s": "2026-06-30",
-          "e": "2026-07-14",
+          "s": "2026-07-17",
+          "e": "2026-07-31",
           "nt": "Ordered - 2 days install"
         },
         "t3": {
           "st": "pending",
           "s": "2026-06-30",
-          "e": "2026-07-25",
+          "e": "2026-07-31",
           "nt": "Exalco - delivery end April, 5 days"
         },
         "t13": {
           "st": "pending",
-          "s": "2026-08-09",
-          "e": "2026-08-20",
+          "s": "2026-09-01",
+          "e": "2026-09-17",
           "nt": "5 days installation"
         },
         "t18": {
           "st": "inprogress",
           "s": "2026-02-22",
-          "e": "2026-06-01",
+          "e": "2026-06-30",
           "nt": "EV station for Fatouros included"
         },
         "t17": {
           "st": "pending",
           "s": "2026-06-26",
-          "e": "2026-09-25",
+          "e": "2026-11-30",
           "nt": "Lobby, hallways, stairwell"
         },
         "pv": {
           "st": "pending",
-          "s": "2026-09-21",
-          "e": "2026-11-04",
+          "s": "2026-09-30",
+          "e": "2026-11-13",
           "nt": "Does not affect unit delivery"
         },
         "pent": {
@@ -3329,7 +3349,7 @@
         "t22": {
           "st": "pending",
           "s": "2026-07-07",
-          "e": "2026-11-02",
+          "e": "2026-12-31",
           "nt": "End of construction - full package"
         },
         "t21": {
@@ -3340,20 +3360,20 @@
         },
         "balfloor": {
           "st": "pending",
-          "s": "2026-07-06",
-          "e": "2026-07-16",
+          "s": "2026-06-26",
+          "e": "2026-07-15",
           "nt": "Exterior-grade tile/decking — must complete before pergola and Jacuzzi"
         },
         "pergola": {
           "st": "pending",
-          "s": "2026-07-16",
-          "e": "2026-07-25",
+          "s": "2026-09-01",
+          "e": "2026-09-10",
           "nt": "After balcony flooring — before railings close out"
         },
         "jacuzzi": {
           "st": "pending",
-          "s": "2026-07-25",
-          "e": "2026-08-01",
+          "s": "2026-07-24",
+          "e": "2026-07-31",
           "nt": "On balcony — requires flooring + pergola first. Plumbing from t10."
         }
       },
