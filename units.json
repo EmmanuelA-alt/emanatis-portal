@@ -3126,8 +3126,8 @@
       "size_m2": 108,
       "client": "Fatouros / Diakatou",
       "token": "3ik6SIixCFPMviVBDwXvoJJfT7l9Dccd",
-      "handover": "15 Aug 2026",
-      "handoverDate": "2026-08-15",
+      "handover": "30 Sept 2026",
+      "handoverDate": "2026-09-30",
       "notes": {
         "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
@@ -3524,7 +3524,8 @@
             "text": "Πιστοποίηση ως πλήρες πακέτο στο τέλος κατασκευής. Ενεργειακοί έλεγχοι: 6μηνο, 12μηνο, 3ετία, 5ετία."
           }
         }
-      }
+      },
+      "phone": "6945802576"
     },
     "p": {
       "name": "Aetheria",
