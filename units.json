@@ -3639,7 +3639,69 @@
       },
       "phone": "6945802576",
       "email": "afatouros@solcrowe.gr",
-      "clientNotes": "Property will be prioritized for client move-in during the month of September. The rest of the apartment building will continue as scheduled for finishing only."
+      "clientNotes": "Property will be prioritized for client move-in during the month of September. The rest of the apartment building will continue as scheduled for finishing only.",
+      "clientActions": [
+        {
+          "id": "bathroom",
+          "action": "Choose bathroom fixtures & tiles",
+          "blocks": "Bathroom tiling and fixtures installation",
+          "done": false,
+          "action_el": "Επιλογή ειδών υγιεινής & πλακετών",
+          "blocks_el": "Τοποθέτηση πλακετών και ειδών υγιεινής"
+        },
+        {
+          "id": "paint",
+          "action": "Choose interior paint colours",
+          "blocks": "Interior painting",
+          "done": false,
+          "action_el": "Επιλογή χρωμάτων εσωτερικής βαφής",
+          "blocks_el": "Εσωτερική βαφή"
+        },
+        {
+          "id": "fireplace",
+          "action": "Confirm fireplace selection",
+          "blocks": "Procurement — awaiting your selection",
+          "done": false,
+          "action_el": "Επιβεβαίωση επιλογής τζακιού",
+          "blocks_el": "Προμήθεια — αναμονή επιλογής σας"
+        },
+        {
+          "id": "jacuzzi_sel",
+          "action": "Confirm Jacuzzi selection",
+          "blocks": "Procurement — awaiting your selection",
+          "done": false,
+          "action_el": "Επιβεβαίωση επιλογής τζακούζι",
+          "blocks_el": "Προμήθεια — αναμονή επιλογής σας"
+        },
+        {
+          "id": "smarthome",
+          "action": "Attend smart home configuration session",
+          "blocks": "Required before move-in — client must be present",
+          "done": false,
+          "action_el": "Παρακολούθηση συνεδρίας ρύθμισης έξυπνου σπιτιού",
+          "blocks_el": "Απαιτείται πριν τη μετακόμιση — ο πελάτης πρέπει να είναι παρών"
+        },
+        {
+          "id": "flooring",
+          "action": "Choose flooring",
+          "blocks": "Flooring installation",
+          "done": true,
+          "done_note": "Delivered — ready for installation",
+          "action_el": "Επιλογή δαπέδου",
+          "blocks_el": "Εγκατάσταση δαπέδου",
+          "done_note_el": "Παραληφθέν — έτοιμο για εγκατάσταση"
+        },
+        {
+          "id": "kitchen",
+          "action": "Choose kitchen design",
+          "blocks": "Kitchen installation",
+          "done": true,
+          "done_note": "Delivered — ready for installation",
+          "action_el": "Επιλογή σχεδιασμού κουζίνας",
+          "blocks_el": "Εγκατάσταση κουζίνας",
+          "done_note_el": "Παραληφθέν — έτοιμο για εγκατάσταση"
+        }
+      ]
     },
     "p": {
       "name": "Aetheria",

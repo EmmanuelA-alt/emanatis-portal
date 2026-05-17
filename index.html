@@ -185,6 +185,8 @@ body.client-mode select{display:none!important}
 body.client-mode .client-info input{background:transparent!important;border:none!important;padding:0!important;color:#ccc!important}
 body.client-mode .client-info input:focus{outline:none!important}
 body.client-mode .notes-section h3 button{display:none!important}
+body.client-mode .notes-section.action-items{display:block!important}
+body.client-mode .notes-section:not(.action-items){display:none!important}
 /* Responsive */
 @media(max-width:900px){
   .client-info>div:first-child{grid-template-columns:1fr 1fr}
@@ -932,17 +934,49 @@ function renderUnit(uid){
 
   html += '</div>';
 
-  // Notes
+  // Client Action Items
+  var actions = unit.clientActions || [];
+  if(actions.length > 0){
+    html += '<div class="notes-section action-items" style="border-color:#2a5080">';
+    html += '<h3>'+(LANG==='el'?'Ενέργειες Πελάτη':'Client Action Items')+' <button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="addClientAction()">+ Add</button></h3>';
+    var pendingCount = actions.filter(a=>!a.done).length;
+    var doneCount = actions.filter(a=>a.done).length;
+    html += '<div style="display:flex;gap:16px;margin-bottom:16px">';
+    html += '<div style="background:#3a1020;border:1px solid #8a2040;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;color:#f05070">☐ '+pendingCount+' '+(LANG==='el'?'Εκκρεμεί':'Pending')+'</div>';
+    html += '<div style="background:#1a4a2e;border:1px solid #2d8a52;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;color:#4dba78">✓ '+doneCount+' '+(LANG==='el'?'Ολοκληρώθηκε':'Complete')+'</div>';
+    html += '</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    actions.forEach(function(a, idx){
+      var aText = (LANG==='el' && a.action_el) ? a.action_el : a.action;
+      var bText = (LANG==='el' && a.blocks_el) ? a.blocks_el : a.blocks;
+      if(a.done){
+        var dNote = (LANG==='el' && a.done_note_el) ? a.done_note_el : (a.done_note || '');
+        html += '<div style="background:#0d2018;border:1px solid #2d8a52;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;opacity:0.7">';
+        html += '<div style="color:#4dba78;font-size:18px;margin-top:2px">✅</div>';
+        html += '<div><div style="font-size:13px;font-weight:600;color:#4dba78;text-decoration:line-through;text-decoration-color:#4dba78">'+esc(aText)+'</div>';
+        if(dNote) html += '<div style="font-size:11px;color:#4dba78;margin-top:4px">'+esc(dNote)+'</div>';
+        html += '</div></div>';
+      } else {
+        html += '<div style="background:#1a1a24;border:1px solid #8a2040;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color 0.15s" onclick="toggleClientAction('+idx+')" title="Click to mark complete">';
+        html += '<div style="color:#f05070;font-size:18px;margin-top:2px">☐</div>';
+        html += '<div><div style="font-size:13px;font-weight:600;color:#f05070">'+esc(aText)+'</div>';
+        html += '<div style="font-size:11px;color:#888;margin-top:4px">'+(LANG==='el'?'Εμποδίζει: ':'Blocks: ')+esc(bText)+'</div>';
+        html += '</div></div>';
+      }
+    });
+    html += '</div></div>';
+  }
+
+  // Keep original notes as admin-only section
   var notes = unit.notes || {};
   var noteMeta = unit._noteMeta || {};
-  html += '<div class="notes-section"><h3>'+(LANG==='el'?'Σημειώσεις Έργου':'Project Notes')+' <button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="openNoteEditor()">+ Add</button></h3><div class="notes-grid">';
+  html += '<div class="notes-section"><h3>'+(LANG==='el'?'Εσωτερικές Σημειώσεις':'Internal Notes')+' <button class="btn btn-primary" style="padding:4px 12px;font-size:11px" onclick="openNoteEditor()">+ Add</button></h3><div class="notes-grid">';
   Object.keys(notes).forEach(nk=>{
     if(!notes[nk]) return;
     var nType = (noteMeta[nk]&&noteMeta[nk].type) || 'info';
     var nLabel = (noteMeta[nk]&&noteMeta[nk].label) || nk;
     var nText = notes[nk];
     if(LANG==='el'){
-      // Check noteTranslations in data first, then fall back to hardcoded
       var ntEl = (unit.noteTranslations && unit.noteTranslations.el && unit.noteTranslations.el[nk]);
       if(ntEl){ nLabel = ntEl.label || nLabel; nText = ntEl.text || nText; }
       else { nLabel = NOTE_LABELS_EL[nk] || nLabel; nText = NOTE_TEXTS_EL[nk] || nText; }
@@ -1068,6 +1102,33 @@ function deleteNote(){
   delete DATA.units[CURRENT_UNIT].notes[EDITING_NOTE];
   if(DATA.units[CURRENT_UNIT]._noteMeta) delete DATA.units[CURRENT_UNIT]._noteMeta[EDITING_NOTE];
   closeNoteEditor(); renderUnit(CURRENT_UNIT); autoSave(); toast('Deleted');
+}
+
+// === CLIENT ACTIONS ===
+function toggleClientAction(idx){
+  if(!CURRENT_UNIT) return;
+  var actions = DATA.units[CURRENT_UNIT].clientActions;
+  if(!actions || !actions[idx]) return;
+  actions[idx].done = !actions[idx].done;
+  renderUnit(CURRENT_UNIT);
+  autoSave();
+  toast(actions[idx].done ? '✓ Marked complete' : '☐ Marked pending');
+}
+function addClientAction(){
+  if(!CURRENT_UNIT || window.IS_READONLY) return;
+  var action = prompt('New action item:');
+  if(!action || !action.trim()) return;
+  var blocks = prompt('What does this block?') || '';
+  if(!DATA.units[CURRENT_UNIT].clientActions) DATA.units[CURRENT_UNIT].clientActions = [];
+  DATA.units[CURRENT_UNIT].clientActions.push({
+    id: 'act_'+Date.now(),
+    action: action.trim(),
+    blocks: blocks.trim(),
+    done: false
+  });
+  renderUnit(CURRENT_UNIT);
+  autoSave();
+  toast('Action item added');
 }
 
 // === REQUEST UPDATE ===
