@@ -187,7 +187,7 @@ body.client-mode .client-info input:focus{outline:none!important}
 body.client-mode .notes-section h3 button{display:none!important}
 body.client-mode .notes-section.action-items{display:block!important}
 body.client-mode .notes-section.action-items .btn{display:none!important}
-body.client-mode .notes-section:not(.action-items){display:none!important}
+body.client-mode .notes-section:not(.action-items){display:block!important;opacity:0.85}
 /* Responsive */
 @media(max-width:900px){
   .client-info>div:first-child{grid-template-columns:1fr 1fr}
@@ -815,30 +815,34 @@ function renderUnit(uid){
   var completedTasks = counts.complete || 0;
   var totalTasks = counts.total || 1;
 
-  // Category weights — structure and MEP are the heavy lifting
-  var CAT_WEIGHT = [3, 2.5, 1.5, 1.5, 1, 0.5]; // Structure=3, MEP=2.5, Interior=1.5, Doors=1.5, Building=1, Handover=0.5
-
-  // Build task-to-category map from template
+  // Weighted category contributions — shell/structure IS the building
+  // Structure (t1 complete) = 55%, MEP rough-in = 20%, Interior = 15%, Doors = 5%, Systems = 3%, Handover = 2%
+  var CAT_CONTRIBUTION = [55, 20, 15, 5, 3, 2]; // totals 100%
   var taskCatMap = {};
   DATA.taskTemplate.forEach(function(t){ if(t.id) taskCatMap[t.id] = t.cat || 0; });
 
-  // Weighted progress calculation
-  var wProgress = 0, wTotal = 0;
+  // Per-category progress from task STATUS (not time-elapsed for pending/blocked)
+  var catProg = {};
+  CAT_CONTRIBUTION.forEach(function(c, i){ catProg[i] = { done: 0, total: 0, activePct: 0 }; });
   Object.keys(tasks).forEach(function(tid){
     var t = tasks[tid];
-    if(!t.s || !t.e) return;
     var cat = taskCatMap[tid] !== undefined ? taskCatMap[tid] : 1;
-    var w = CAT_WEIGHT[cat] || 1;
-    var ts = new Date(t.s).getTime(), te = new Date(t.e).getTime(), tn = Date.now();
-    var p;
-    if(t.st === 'complete') p = 1;
-    else if(tn <= ts) p = 0;
-    else if(tn >= te) p = 1;
-    else p = (tn - ts) / (te - ts);
-    wProgress += p * w;
-    wTotal += w;
+    if(catProg[cat] === undefined) catProg[cat] = { done: 0, total: 0, activePct: 0 };
+    catProg[cat].total++;
+    if(t.st === 'complete'){ catProg[cat].done++; }
+    else if((t.st === 'inprogress' || t.st === 'critical') && t.s && t.e){
+      var ts = new Date(t.s).getTime(), te = new Date(t.e).getTime(), tn = Date.now();
+      var tp = tn <= ts ? 0 : tn >= te ? 1 : (tn - ts) / (te - ts);
+      catProg[cat].activePct += tp;
+    }
   });
-  var overallPct = wTotal > 0 ? Math.round((wProgress / wTotal) * 100) : 0;
+  var overallPct = 0;
+  CAT_CONTRIBUTION.forEach(function(w, cat){
+    var cp = catProg[cat];
+    if(!cp || cp.total === 0) return;
+    overallPct += ((cp.done + cp.activePct) / cp.total) * w;
+  });
+  overallPct = Math.round(Math.min(100, Math.max(0, overallPct)));
   var pctColor = overallPct >= 80 ? '#4dba78' : overallPct >= 50 ? '#f0a830' : '#f05070';
   var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : overallPct >= 50 ? (LANG==='el'?'Σε Εξέλιξη':'In Progress') : (LANG==='el'?'Ξεκινώντας':'Getting Started');
 

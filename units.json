@@ -1,6 +1,6 @@
 {
   "building": {
-    "name": "Luminara",
+    "name": "Galatsi Residence",
     "address": "Ipeirou 22, Galatsi",
     "certification": "LEED Platinum",
     "masterToken": "lm-master-2026",
@@ -311,7 +311,7 @@
           "st": "pending",
           "s": "2026-07-07",
           "e": "2026-07-31",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "inprogress",
@@ -335,7 +335,7 @@
           "st": "critical",
           "s": "2026-05-20",
           "e": "2026-06-05",
-          "nt": "Selection meeting needed."
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -347,7 +347,7 @@
           "st": "pending",
           "s": "2026-06-25",
           "e": "2026-07-04",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -359,7 +359,7 @@
           "st": "pending",
           "s": "2026-06-15",
           "e": "2026-07-30",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -628,7 +628,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -694,7 +694,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -718,7 +718,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -730,7 +730,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -742,7 +742,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -989,7 +989,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -1055,7 +1055,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -1079,7 +1079,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -1091,7 +1091,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -1103,7 +1103,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -1350,7 +1350,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -1416,7 +1416,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -1440,7 +1440,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -1452,7 +1452,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -1464,7 +1464,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -1711,7 +1711,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -1777,7 +1777,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -1801,7 +1801,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -1813,7 +1813,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -1825,7 +1825,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -2137,7 +2137,7 @@
           "st": "pending",
           "s": "2026-06-09",
           "e": "2026-08-19",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -2161,7 +2161,7 @@
           "st": "critical",
           "s": "2026-07-04",
           "e": "2026-07-29",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -2173,7 +2173,7 @@
           "st": "pending",
           "s": "2026-05-29",
           "e": "2026-06-21",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -2185,7 +2185,7 @@
           "st": "pending",
           "s": "2026-06-30",
           "e": "2026-08-17",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -2447,7 +2447,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -2513,7 +2513,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -2537,7 +2537,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -2549,7 +2549,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -2561,7 +2561,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -2808,7 +2808,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -2874,7 +2874,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -2898,7 +2898,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -2910,7 +2910,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -2922,7 +2922,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -3169,7 +3169,7 @@
       "handover": "End of September 2026",
       "handoverDate": "2026-09-30",
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for End of September 2026 handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -3283,7 +3283,7 @@
           "st": "critical",
           "s": "2026-06-06",
           "e": "2026-06-22",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -3712,7 +3712,7 @@
       "handover": "[TBD]",
       "handoverDate": null,
       "notes": {
-        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for May handover.",
+        "action": "Bathroom fixtures selection meeting with Fatouros/Diakatou must be scheduled immediately. Critical path for handover.",
         "paint": "Interior paint colours to be selected during bathroom fixtures meeting.",
         "facade": "Exterior facade: painted finish OR PVC paneling - decision required.",
         "ev": "Dedicated EV charging station included in basement/parking scope.",
@@ -3778,7 +3778,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-05-02",
-          "nt": "Phased - unit complete April"
+          "nt": "Phased installation"
         },
         "t6": {
           "st": "blocked",
@@ -3802,7 +3802,7 @@
           "st": "critical",
           "s": "2026-04-01",
           "e": "2026-04-17",
-          "nt": "Selection meeting needed - CRITICAL PATH"
+          "nt": "Client selection meeting required — contact Emanatis to schedule"
         },
         "t14": {
           "st": "pending",
@@ -3814,7 +3814,7 @@
           "st": "pending",
           "s": "2026-04-08",
           "e": "2026-04-17",
-          "nt": "Ordered - delivery early April"
+          "nt": "Ordered — delivery confirmed"
         },
         "t5": {
           "st": "pending",
@@ -3826,7 +3826,7 @@
           "st": "pending",
           "s": "2026-05-04",
           "e": "2026-05-12",
-          "nt": "Exalco - delivery end April, 5 days"
+          "nt": "Exalco — delivery confirmed, 5 days install"
         },
         "t13": {
           "st": "pending",
@@ -4097,6 +4097,5 @@
     "hrv": 1,
     "pv": 1,
     "pent": 1
-  },
-  "_lastSaved": "2026-05-18T08:05:52.875Z"
+  }
 }
