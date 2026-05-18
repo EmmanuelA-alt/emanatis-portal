@@ -815,34 +815,62 @@ function renderUnit(uid){
   var completedTasks = counts.complete || 0;
   var totalTasks = counts.total || 1;
 
-  // Weighted category contributions — shell/structure IS the building
-  // Structure (t1 complete) = 55%, MEP rough-in = 20%, Interior = 15%, Doors = 5%, Systems = 3%, Handover = 2%
-  var CAT_CONTRIBUTION = [55, 20, 15, 5, 3, 2]; // totals 100%
-  var taskCatMap = {};
-  DATA.taskTemplate.forEach(function(t){ if(t.id) taskCatMap[t.id] = t.cat || 0; });
-
-  // Per-category progress from task STATUS (not time-elapsed for pending/blocked)
-  var catProg = {};
-  CAT_CONTRIBUTION.forEach(function(c, i){ catProg[i] = { done: 0, total: 0, activePct: 0 }; });
+  // Task-level weight system: t1 (shell) IS the building = 50% of total project
+  // MEP rough-in, electrical, plumbing, drywall, windows = another 15%+
+  // Interior finishes, handover = the rest
+  var TASK_WEIGHT = {
+    't1': 50,      // Structural/Shell — THE building
+    'hvac': 8,     // HVAC/UFH/heat pump
+    'hrv': 3,      // Energy recovery
+    't10': 5,      // Plumbing final
+    't11': 7,      // Electrical final
+    't6': 4,       // Drywall
+    't3': 3,       // Windows/exterior glazing
+    't2': 3,       // Waterproofing
+    't7': 3,       // Flooring
+    't8': 2,       // Kitchen
+    't9': 2,       // Bathroom fixtures
+    't4': 1.5,     // Exterior doors
+    't5': 1.5,     // Interior doors
+    't14': 1,      // Interior painting
+    't16': 1,      // Balcony railings
+    't15': 1,      // Facade
+    't19': 1,      // Fire safety
+    't20': 1,      // Security/smart home
+    't13': 0.5,    // Elevator
+    't18': 0.5,    // Parking/EV
+    't17': 0.3,    // Common areas
+    'pv': 0.2,     // PV/battery
+    'pent': 0.5,   // Penthouse
+    'commission': 0.5,  // Commissioning
+    'walkthrough': 0.2,
+    't24': 0.2,
+    't23': 0.2,
+    't22': 0.1,
+    't21': 0.2,
+    'balcony_wp': 0.5,
+    'balfloor': 0.3,
+    'pergola': 0.3,
+    'jacuzzi': 0.3,
+    'plaster': 0.5,
+    'bath_tile': 0.5
+  };
+  var wTotal = 0, wProgress = 0;
   Object.keys(tasks).forEach(function(tid){
     var t = tasks[tid];
-    var cat = taskCatMap[tid] !== undefined ? taskCatMap[tid] : 1;
-    if(catProg[cat] === undefined) catProg[cat] = { done: 0, total: 0, activePct: 0 };
-    catProg[cat].total++;
-    if(t.st === 'complete'){ catProg[cat].done++; }
-    else if((t.st === 'inprogress' || t.st === 'critical') && t.s && t.e){
-      var ts = new Date(t.s).getTime(), te = new Date(t.e).getTime(), tn = Date.now();
-      var tp = tn <= ts ? 0 : tn >= te ? 1 : (tn - ts) / (te - ts);
-      catProg[cat].activePct += tp;
+    var w = TASK_WEIGHT[tid] || 0.3;
+    var p = 0;
+    if(t.st === 'complete'){ p = 1; }
+    else if(t.st === 'inprogress' || t.st === 'critical'){
+      if(t.s && t.e){
+        var ts = new Date(t.s).getTime(), te = new Date(t.e).getTime(), tn = Date.now();
+        p = tn <= ts ? 0 : tn >= te ? 1 : (tn - ts) / (te - ts);
+      }
     }
+    wProgress += p * w;
+    wTotal += w;
   });
-  var overallPct = 0;
-  CAT_CONTRIBUTION.forEach(function(w, cat){
-    var cp = catProg[cat];
-    if(!cp || cp.total === 0) return;
-    overallPct += ((cp.done + cp.activePct) / cp.total) * w;
-  });
-  overallPct = Math.round(Math.min(100, Math.max(0, overallPct)));
+  var overallPct = wTotal > 0 ? Math.round(Math.min(100, Math.max(0, (wProgress / wTotal) * 100))) : 0;
   var pctColor = overallPct >= 80 ? '#4dba78' : overallPct >= 50 ? '#f0a830' : '#f05070';
   var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : overallPct >= 50 ? (LANG==='el'?'Σε Εξέλιξη':'In Progress') : (LANG==='el'?'Ξεκινώντας':'Getting Started');
 
