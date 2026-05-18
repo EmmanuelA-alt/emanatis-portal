@@ -3783,6 +3783,16 @@
           "blocks_el": "Τελικα ΣΤΟΙΧΕΙΑ Σ",
           "done_note": "",
           "done_note_el": ""
+        },
+        {
+          "id": "act_1779096682094",
+          "action": "Meet with Designer",
+          "blocks": "Final design elements",
+          "done": false,
+          "action_el": "Συνάντηση με τον σχεδιαστή",
+          "blocks_el": "Τελικα ΣΤΟΙΧΕΙΑ Σ",
+          "done_note": "",
+          "done_note_el": ""
         }
       ]
     },
@@ -4187,5 +4197,5 @@
     "pv": 1,
     "pent": 1
   },
-  "_lastSaved": "2026-05-18T09:23:51.656Z"
+  "_lastSaved": "2026-05-18T09:31:25.104Z"
 }
