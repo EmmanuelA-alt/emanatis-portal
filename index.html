@@ -820,40 +820,40 @@ function renderUnit(uid){
   // Interior finishes, handover = the rest
   var TASK_WEIGHT = {
     't1': 50,      // Structural/Shell — THE building
-    'hvac': 8,     // HVAC/UFH/heat pump
+    'hvac': 5,     // HVAC/UFH/heat pump
     'hrv': 3,      // Energy recovery
     't10': 5,      // Plumbing final
     't11': 7,      // Electrical final
     't6': 4,       // Drywall
-    't3': 3,       // Windows/exterior glazing
-    't2': 3,       // Waterproofing
-    't7': 3,       // Flooring
-    't8': 2,       // Kitchen
-    't9': 2,       // Bathroom fixtures
-    't4': 1.5,     // Exterior doors
-    't5': 1.5,     // Interior doors
-    't14': 1,      // Interior painting
-    't16': 1,      // Balcony railings
-    't15': 1,      // Facade
-    't19': 1,      // Fire safety
-    't20': 1,      // Security/smart home
-    't13': 0.5,    // Elevator
-    't18': 0.5,    // Parking/EV
-    't17': 0.3,    // Common areas
-    'pv': 0.2,     // PV/battery
-    'pent': 0.5,   // Penthouse
-    'commission': 0.5,  // Commissioning
-    'walkthrough': 0.2,
-    't24': 0.2,
-    't23': 0.2,
+    't3': 2,       // Windows/exterior glazing
+    't2': 2,       // Waterproofing
+    't7': 2,       // Flooring
+    't8': 1.5,     // Kitchen
+    't9': 1.5,     // Bathroom fixtures
+    't4': 1,       // Exterior doors
+    't5': 1,       // Interior doors
+    't14': 0.5,    // Interior painting
+    't16': 0.5,    // Balcony railings
+    't15': 0.5,    // Facade
+    't19': 0.5,    // Fire safety
+    't20': 0.5,    // Security/smart home
+    't13': 0.2,    // Elevator
+    't18': 0.3,    // Parking/EV
+    't17': 0.2,    // Common areas
+    'pv': 0.1,     // PV/battery
+    'pent': 0.3,   // Penthouse
+    'commission': 0.3,  // Commissioning
+    'walkthrough': 0.1,
+    't24': 0.1,
+    't23': 0.1,
     't22': 0.1,
-    't21': 0.2,
-    'balcony_wp': 0.5,
-    'balfloor': 0.3,
-    'pergola': 0.3,
-    'jacuzzi': 0.3,
-    'plaster': 0.5,
-    'bath_tile': 0.5
+    't21': 0.1,
+    'balcony_wp': 0.3,
+    'balfloor': 0.2,
+    'pergola': 0.2,
+    'jacuzzi': 0.2,
+    'plaster': 0.3,
+    'bath_tile': 0.3
   };
   var wTotal = 0, wProgress = 0;
   Object.keys(tasks).forEach(function(tid){
@@ -872,7 +872,7 @@ function renderUnit(uid){
   });
   var overallPct = wTotal > 0 ? Math.round(Math.min(100, Math.max(0, (wProgress / wTotal) * 100))) : 0;
   var pctColor = overallPct >= 80 ? '#4dba78' : overallPct >= 50 ? '#f0a830' : '#f05070';
-  var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : overallPct >= 50 ? (LANG==='el'?'Σε Εξέλιξη':'In Progress') : (LANG==='el'?'Ξεκινώντας':'Getting Started');
+  var statusLabel = overallPct >= 80 ? (LANG==='el'?'Σχεδόν Ολοκλήρωση':'Nearing Completion') : (LANG==='el'?'Σε Εξέλιξη':'In Progress');
 
   html += '<div class="stat" style="position:relative">';
   html += '<div class="slabel">'+(LANG==='el'?'Πρόοδος':'Progress')+'</div>';
@@ -888,8 +888,6 @@ function renderUnit(uid){
   // Labels
   html += '<div>';
   html += '<div style="font-size:15px;font-weight:700;color:'+pctColor+'">'+statusLabel+'</div>';
-  html += '<div style="font-size:11px;color:#888;margin-top:2px">'+completedTasks+'/'+totalTasks+' '+(LANG==='el'?'εργασίες ολοκληρώθηκαν':'tasks complete')+'</div>';
-  if(counts.inprogress > 0) html += '<div style="font-size:11px;color:#f0a830;margin-top:1px">'+counts.inprogress+' '+(LANG==='el'?'ενεργά':'active')+'</div>';
   html += '</div></div></div>';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Μονάδα':'Unit')+'</div><div class="svalue">'+esc(unit.name)+'</div><div class="ssub">Floor '+unit.floor+' · '+(unit.size_m2||108)+' m²</div></div>';
   html += '<div class="stat"><div class="slabel">'+(LANG==='el'?'Πιστοποίηση':'Certification')+'</div><div class="svalue" style="color:#4dba78">LEED</div><div class="ssub">'+(LANG==='el'?'Στόχος Platinum':'Platinum target')+'</div></div>';
