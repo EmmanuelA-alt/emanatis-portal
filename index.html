@@ -1402,8 +1402,11 @@ function autoSave(){
   try {
     localStorage.setItem(DATA_KEY, JSON.stringify(DATA));
     var el = document.getElementById('autoSaveStatus');
-    if(el){ el.textContent = '✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' saved'; setTimeout(function(){ if(el) el.textContent=''; }, 3000); }
+    if(el){ el.textContent = '✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' auto-saved'; setTimeout(function(){ if(el) el.textContent=''; }, 3000); }
   } catch(e){}
+  // Debounced GitHub save — saves 3 seconds after last edit
+  if(window._autoSaveTimer) clearTimeout(window._autoSaveTimer);
+  window._autoSaveTimer = setTimeout(function(){ saveData(); }, 3000);
 }
 function saveData(){
   DATA._lastSaved = new Date().toISOString();
