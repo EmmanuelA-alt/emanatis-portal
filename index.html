@@ -819,17 +819,18 @@ function renderUnit(uid){
   // MEP rough-in, electrical, plumbing, drywall, windows = another 15%+
   // Interior finishes, handover = the rest
   var TASK_WEIGHT = {
-    't1': 50,      // Structural/Shell — THE building
-    'hvac': 5,     // HVAC/UFH/heat pump
+    't1': 44,      // Structural/Shell — THE building
+    'hvac': 3,     // HVAC/UFH/heat pump
     'hrv': 3,      // Energy recovery
     't10': 5,      // Plumbing final
-    't11': 7,      // Electrical final
+    't11': 3,      // Electrical final
     't6': 4,       // Drywall
     't3': 2,       // Windows/exterior glazing
     't2': 2,       // Waterproofing
     't7': 2,       // Flooring
     't8': 1.5,     // Kitchen
     't9': 1.5,     // Bathroom fixtures
+    'bath_heat': 0.5, // Bathroom floor heating
     't4': 1,       // Exterior doors
     't5': 1,       // Interior doors
     't14': 0.5,    // Interior painting
