@@ -136,6 +136,11 @@
       "cat": 2
     },
     {
+      "id": "bath_heat",
+      "nm": "Bathroom Floor Heating",
+      "cat": 2
+    },
+    {
       "id": "t7",
       "nm": "Flooring",
       "cat": 2
@@ -414,6 +419,12 @@
           "s": "2026-08-16",
           "e": "2026-10-30",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -797,6 +808,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -1158,6 +1175,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -1519,6 +1542,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -1880,6 +1909,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -2240,6 +2275,12 @@
           "s": "2026-06-25",
           "e": "2026-11-21",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -2616,6 +2657,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -2977,6 +3024,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
@@ -3424,6 +3477,12 @@
           "s": "2026-09-10",
           "e": "2026-09-15",
           "nt": "Pre-handover walk-through with client. Snag list generated and resolved before handover."
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "translations": {
@@ -3895,6 +3954,12 @@
           "s": "2026-05-08",
           "e": "2026-07-22",
           "nt": "Phased May-July"
+        },
+        "bath_heat": {
+          "st": "pending",
+          "s": "2026-07-01",
+          "e": "2026-07-10",
+          "nt": "Electric underfloor heating — after drywall, before tiling"
         }
       },
       "milestones": [],
