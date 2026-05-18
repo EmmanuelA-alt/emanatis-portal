@@ -3773,6 +3773,16 @@
           "action_el": "Επιλογή σχεδιασμού κουζίνας",
           "blocks_el": "Εγκατάσταση κουζίνας",
           "done_note_el": "Παραληφθέν — έτοιμο για εγκατάσταση"
+        },
+        {
+          "id": "act_1779096050867",
+          "action": "Meet with Designer",
+          "blocks": "Final design elements",
+          "done": false,
+          "action_el": "Συνάντηση με τον σχεδιαστή",
+          "blocks_el": "Τελικα ΣΤΟΙΧΕΙΑ Σ",
+          "done_note": "",
+          "done_note_el": ""
         }
       ]
     },
@@ -4177,5 +4187,5 @@
     "pv": 1,
     "pent": 1
   },
-  "_lastSaved": "2026-05-18T08:57:55.927Z"
+  "_lastSaved": "2026-05-18T09:20:53.879Z"
 }
