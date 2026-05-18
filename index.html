@@ -1116,7 +1116,9 @@ function renderUnit(uid){
     html += '<div style="background:#1a4a2e;border:1px solid #2d8a52;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;color:#4dba78">✓ '+doneCount+' '+(LANG==='el'?'Ολοκληρώθηκε':'Complete')+'</div>';
     html += '</div>';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
-    actions.forEach(function(a, idx){
+    var sortedActions = actions.map(function(a,i){return{a:a,idx:i};}).sort(function(x,y){return(y.a.done?1:0)-(x.a.done?1:0);});
+    sortedActions.forEach(function(item){
+      var a=item.a,idx=item.idx;
       var aText = (LANG==='el' && a.action_el) ? a.action_el : a.action;
       var bText = (LANG==='el' && a.blocks_el) ? a.blocks_el : a.blocks;
       if(a.done){
